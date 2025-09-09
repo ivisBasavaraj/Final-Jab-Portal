@@ -52,16 +52,19 @@ function SectionCandicateBasicInfo() {
         e.preventDefault();
         setSaving(true);
         
+        console.log('Form data being sent:', formData);
+        
         try {
             const response = await api.updateCandidateProfile(formData);
+            console.log('API response:', response);
             if (response.success) {
                 alert('Profile updated successfully!');
             } else {
-                alert('Failed to update profile');
+                alert('Failed to update profile: ' + (response.message || 'Unknown error'));
             }
         } catch (error) {
             console.error('Error updating profile:', error);
-            alert('Error updating profile');
+            alert('Error updating profile: ' + error.message);
         } finally {
             setSaving(false);
         }
