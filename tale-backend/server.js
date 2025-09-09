@@ -19,8 +19,13 @@ const app = express();
 connectDB();
 
 // Security Middleware
-app.use(helmet());
-app.use(cors());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 
 // Rate Limiting
 const limiter = rateLimit({

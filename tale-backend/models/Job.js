@@ -5,20 +5,30 @@ const jobSchema = new mongoose.Schema({
   description: { type: String, required: true },
   employerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employer', required: true },
   location: { type: String, required: true },
-  salary: {
-    min: { type: Number },
-    max: { type: Number },
-    currency: { type: String, default: 'USD' }
+  salary: { type: String },
+  jobType: { type: String, enum: ['full-time', 'part-time', 'contract', 'internship', 'internship-(paid)', 'internship-(unpaid)', 'work-from-home'], required: true },
+  vacancies: { type: Number },
+  applicationLimit: { type: Number },
+  education: { type: String },
+  backlogsAllowed: { type: Boolean, default: false },
+  requiredSkills: [String],
+  experienceLevel: { type: String, enum: ['freshers', 'minimum', 'both', 'entry', 'mid', 'senior', 'executive'] },
+  minExperience: { type: Number, default: 0 },
+  interviewRoundsCount: { type: Number },
+  interviewRoundTypes: {
+    technical: { type: Boolean, default: false },
+    managerial: { type: Boolean, default: false },
+    nonTechnical: { type: Boolean, default: false },
+    final: { type: Boolean, default: false },
+    hr: { type: Boolean, default: false }
   },
-  jobType: { type: String, enum: ['full-time', 'part-time', 'contract', 'internship'], required: true },
-  category: { type: String },
-  requirements: [String],
-  benefits: [String],
-  skills: [String],
-  experienceLevel: { type: String, enum: ['entry', 'mid', 'senior', 'executive'] },
+  offerLetterDate: { type: Date },
+  transportation: {
+    oneWay: { type: Boolean, default: false },
+    twoWay: { type: Boolean, default: false },
+    noCab: { type: Boolean, default: false }
+  },
   status: { type: String, enum: ['active', 'closed', 'draft', 'pending'], default: 'pending' },
-  expiresAt: { type: Date },
-  isRemote: { type: Boolean, default: false },
   applicationCount: { type: Number, default: 0 }
 }, {
   timestamps: true

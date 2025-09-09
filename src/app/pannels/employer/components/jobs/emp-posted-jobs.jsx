@@ -46,6 +46,54 @@ export default function EmpPostedJobs() {
         return status === 'active' ? 'twm-bg-green' : 'twm-bg-red';
     };
 
+    const handleDelete = async (jobId) => {
+        if (!window.confirm('Are you sure you want to delete this job?')) return;
+        
+        try {
+            const token = localStorage.getItem('employerToken');
+            const response = await fetch(`http://localhost:5000/api/employer/jobs/${jobId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.ok) {
+                alert('Job deleted successfully!');
+                fetchJobs(); // Refresh the list
+            } else {
+                alert('Failed to delete job');
+            }
+        } catch (error) {
+            console.error('Error deleting job:', error);
+            alert('Failed to delete job');
+        }
+    };
+
+    const handleStatusToggle = async (jobId, currentStatus) => {
+        const newStatus = currentStatus === 'active' ? 'closed' : 'active';
+        
+        try {
+            const token = localStorage.getItem('employerToken');
+            const response = await fetch(`http://localhost:5000/api/employer/jobs/${jobId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+            
+            if (response.ok) {
+                alert(`Job ${newStatus === 'active' ? 'activated' : 'closed'} successfully!`);
+                fetchJobs(); // Refresh the list
+            } else {
+                alert('Failed to update job status');
+            }
+        } catch (error) {
+            console.error('Error updating job status:', error);
+            alert('Failed to update job status');
+        }
+    };
+
 	return (
 		<>
 			<div className="wt-admin-right-page-header clearfix">
@@ -134,16 +182,40 @@ export default function EmpPostedJobs() {
 													</small>
 												</div>
 											</div>
-											<div className="d-flex align-items-center gap-3">
+											<div className="d-flex align-items-center gap-2">
 												<span className={`badge ${getStatusBadge(job.status)} text-capitalize`}>
 													{job.status}
 												</span>
-												<button
-													className="btn btn-outline-primary btn-sm"
-													onClick={() => navigate(`/employer/emp-job-review/${job._id}`)}
-												>
-													<i className="fa fa-eye me-1" /> View Details
-												</button>
+												<div className="btn-group" role="group">
+													<button
+														className="btn btn-outline-primary btn-sm"
+														onClick={() => navigate(`/employer/emp-job-review/${job._id}`)}
+														title="View Details"
+													>
+														<i className="fa fa-eye" />
+													</button>
+													<button
+														className="btn btn-outline-success btn-sm"
+														onClick={() => navigate(`/employer/edit-job/${job._id}`)}
+														title="Edit Job"
+													>
+														<i className="fa fa-edit" />
+													</button>
+													<button
+														className={`btn btn-outline-${job.status === 'active' ? 'warning' : 'info'} btn-sm`}
+														onClick={() => handleStatusToggle(job._id, job.status)}
+														title={job.status === 'active' ? 'Close Job' : 'Activate Job'}
+													>
+														<i className={`fa fa-${job.status === 'active' ? 'pause' : 'play'}`} />
+													</button>
+													<button
+														className="btn btn-outline-danger btn-sm"
+														onClick={() => handleDelete(job._id)}
+														title="Delete Job"
+													>
+														<i className="fa fa-trash" />
+													</button>
+												</div>
 											</div>
 										</div>
 									</div>

@@ -74,10 +74,10 @@ exports.getProfile = async (req, res) => {
       .populate('candidateId', 'name email phone');
     
     if (!profile) {
-      return res.json({ success: true, data: null });
+      return res.json({ success: true, profile: null });
     }
 
-    res.json({ success: true, data: profile });
+    res.json({ success: true, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -85,15 +85,32 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    console.log('Update data:', req.body);
+    console.log('Request body:', req.body);
+    console.log('User ID:', req.user._id);
+    
+    const { name, phone, email, profilePicture, ...profileData } = req.body;
+    
+    // Update candidate basic info
+    if (name || phone || email) {
+      const updatedCandidate = await Candidate.findByIdAndUpdate(req.user._id, {
+        ...(name && { name }),
+        ...(phone && { phone }),
+        ...(email && { email })
+      }, { new: true });
+      console.log('Updated candidate:', updatedCandidate);
+    }
+    
+    // Update profile data (excluding profilePicture for now)
     const profile = await CandidateProfile.findOneAndUpdate(
       { candidateId: req.user._id },
-      req.body,
+      profileData,
       { new: true, upsert: true }
     ).populate('candidateId', 'name email phone');
-
-    res.json({ success: true, data: profile });
+    
+    console.log('Updated profile:', profile);
+    res.json({ success: true, profile });
   } catch (error) {
+    console.error('Profile update error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

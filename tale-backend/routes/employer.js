@@ -40,20 +40,22 @@ router.post('/password/confirm-reset', [
 router.use(auth(['employer']));
 
 // Profile Management Routes
+router.get('/profile', employerController.getProfile);
 router.put('/profile', employerController.updateProfile);
 router.post('/profile/logo', upload.single('logo'), employerController.uploadLogo);
+router.post('/profile/cover', upload.single('cover'), employerController.uploadCover);
 
 // Job Management Routes
+router.get('/jobs', employerController.getEmployerJobs);
 router.post('/jobs', [
   body('title').notEmpty().withMessage('Job title is required'),
   body('description').notEmpty().withMessage('Job description is required'),
   body('location').notEmpty().withMessage('Location is required'),
-  body('jobType').isIn(['full-time', 'part-time', 'contract', 'internship']).withMessage('Invalid job type')
+  body('jobType').isIn(['full-time', 'part-time', 'contract', 'internship', 'internship-(paid)', 'internship-(unpaid)', 'work-from-home']).withMessage('Invalid job type')
 ], handleValidationErrors, employerController.createJob);
 
 router.put('/jobs/:jobId', employerController.updateJob);
 router.delete('/jobs/:jobId', employerController.deleteJob);
-router.get('/jobs', employerController.getEmployerJobs);
 
 // Application Management Routes
 router.get('/applications', employerController.getEmployerApplications);

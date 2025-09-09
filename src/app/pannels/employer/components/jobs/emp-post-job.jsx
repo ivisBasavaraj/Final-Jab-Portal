@@ -1,9 +1,11 @@
 
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useParams } from "react-router-dom";
 import { employer, empRoute, publicUser } from "../../../../../globals/route-names";
 
 export default function EmpPostJob({ onNext }) {
+	const { id } = useParams();
+	const isEditMode = Boolean(id);
 	const [formData, setFormData] = useState({
 		jobTitle: "",
 		jobLocation: "",
@@ -11,6 +13,8 @@ export default function EmpPostJob({ onNext }) {
 		netSalary: "",
 		ctc: "",
 		vacancies: "",
+		applicationLimit: "",
+		jobDescription: "",
 		education: "", // dropdown
 		backlogsAllowed: false,
 		requiredSkills: [],
@@ -42,6 +46,66 @@ export default function EmpPostJob({ onNext }) {
 
 	/* Helpers */
 	const update = (patch) => setFormData((s) => ({ ...s, ...patch }));
+
+	useEffect(() => {
+		if (isEditMode) {
+			fetchJobData();
+		}
+	}, [id, isEditMode]);
+
+	const fetchJobData = async () => {
+		try {
+			const token = localStorage.getItem('employerToken');
+			const response = await fetch('http://localhost:5000/api/employer/jobs', {
+				headers: { 'Authorization': `Bearer ${token}` }
+			});
+			const data = await response.json();
+			if (data.success) {
+				const job = data.jobs.find(j => j._id === id);
+				if (job) {
+					setFormData({
+						jobTitle: job.title || '',
+						jobLocation: job.location || '',
+						jobType: job.jobType || '',
+						ctc: job.salary || '',
+						netSalary: '',
+						vacancies: job.vacancies || '',
+						applicationLimit: job.applicationLimit || '',
+						jobDescription: job.description || '',
+						education: job.education || '',
+						backlogsAllowed: job.backlogsAllowed || false,
+						requiredSkills: job.requiredSkills || [],
+						experienceLevel: job.experienceLevel || 'freshers',
+						minExperience: job.minExperience || '',
+						interviewRoundsCount: job.interviewRoundsCount || '',
+						interviewRoundTypes: job.interviewRoundTypes || {
+							technical: false,
+							managerial: false,
+							nonTechnical: false,
+							final: false,
+							hr: false,
+						},
+						offerLetterDate: job.offerLetterDate ? job.offerLetterDate.split('T')[0] : '',
+						transportation: job.transportation || {
+							oneWay: false,
+							twoWay: false,
+							noCab: false,
+						},
+						skillInput: '',
+						joiningDate: '',
+						interviewMode: {
+							faceToFace: false,
+							phone: false,
+							videoCall: false,
+							documentVerification: false,
+						}
+					});
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching job data:', error);
+		}
+	};
 
 	/* Skills logic */
 	const addSkill = () => {
@@ -79,19 +143,30 @@ export default function EmpPostJob({ onNext }) {
 			const jobData = {
 				title: formData.jobTitle,
 				location: formData.jobLocation,
-				jobType: formData.jobType.toLowerCase().replace('-', ''),
+				jobType: formData.jobType.toLowerCase().replace(/\s+/g, '-'),
 				salary: formData.ctc || formData.netSalary,
-				vacancies: parseInt(formData.vacancies),
-				description: 'Job description will be added in next step',
+				vacancies: parseInt(formData.vacancies) || 0,
+				applicationLimit: parseInt(formData.applicationLimit) || 0,
+				description: formData.jobDescription || 'Job description to be updated',
 				requiredSkills: formData.requiredSkills,
 				experienceLevel: formData.experienceLevel,
 				minExperience: formData.minExperience ? parseInt(formData.minExperience) : 0,
 				education: formData.education,
-				backlogsAllowed: formData.backlogsAllowed
+				backlogsAllowed: formData.backlogsAllowed,
+				interviewRoundsCount: parseInt(formData.interviewRoundsCount) || 0,
+				interviewRoundTypes: formData.interviewRoundTypes,
+				offerLetterDate: formData.offerLetterDate || null,
+				transportation: formData.transportation
 			};
 
-			const response = await fetch('http://localhost:5000/api/employer/jobs', {
-				method: 'POST',
+			const url = isEditMode 
+				? `http://localhost:5000/api/employer/jobs/${id}`
+				: 'http://localhost:5000/api/employer/jobs';
+			
+			const method = isEditMode ? 'PUT' : 'POST';
+
+			const response = await fetch(url, {
+				method: method,
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${token}`
@@ -101,11 +176,11 @@ export default function EmpPostJob({ onNext }) {
 
 			if (response.ok) {
 				const data = await response.json();
-				alert('Job posted successfully!');
+				alert(isEditMode ? 'Job updated successfully!' : 'Job posted successfully!');
 				window.location.href = '/employer/manage-jobs';
 			} else {
 				const error = await response.json();
-				alert(error.message || 'Failed to post job');
+				alert(error.message || `Failed to ${isEditMode ? 'update' : 'post'} job`);
 			}
 		} catch (error) {
 			console.error('Error posting job:', error);
@@ -226,7 +301,7 @@ export default function EmpPostJob({ onNext }) {
 			{/* Card */}
 			<div style={card}>
 				<h3 style={{ marginTop: 0, marginBottom: 14, fontSize: 16 }}>
-					Job Information
+					{isEditMode ? 'Edit Job Information' : 'Job Information'}
 				</h3>
 
 				<div style={grid}>
@@ -308,7 +383,7 @@ export default function EmpPostJob({ onNext }) {
 							type="number"
 							placeholder="e.g., 100"
 							value={formData.applicationLimit}
-							onChange={(e) => update({ vacancies: e.target.value })}
+							onChange={(e) => update({ applicationLimit: e.target.value })}
 						/>
 					</div>
 
@@ -532,7 +607,12 @@ export default function EmpPostJob({ onNext }) {
 					{/* Job Description */}
 					<div style={fullRow}>
 						<label style={label}>Job Description *</label>
-						<textarea style={input} />
+						<textarea 
+							style={{...input, minHeight: '100px'}} 
+							value={formData.jobDescription}
+							onChange={(e) => update({ jobDescription: e.target.value })}
+							placeholder="Enter detailed job description..."
+						/>
 					</div>
 
 					{/* Candidate Transportation & Interview Facility (full row) */}
@@ -607,7 +687,7 @@ export default function EmpPostJob({ onNext }) {
 							cursor: "pointer",
 						}}
 					>
-						Next
+						{isEditMode ? 'Update Job' : 'Next'}
 					</button>
 				</div>
 			</div>

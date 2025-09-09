@@ -18,7 +18,8 @@ function EmployerRoutes() {
 				<Route path={employer.DASHBOARD} element={<EmpDashboardPage />} />
 				<Route path={employer.PROFILE} element={<EmpCompanyProfilePage />} />
 				<Route path={employer.MANAGE_JOBS} element={<EmpPostedJobs />} /> 
-				<Route path={employer.POST_A_JOB} element={<EmpPostJob />} /> 
+				<Route path={employer.POST_A_JOB} element={<EmpPostJob />} />
+				<Route path="/edit-job/:id" element={<EmpPostJob />} /> 
 				<Route
 					path={employer.CREATE_ASSESSMENT}
 					element={<AssessmentDashboard />}
@@ -29,7 +30,7 @@ function EmployerRoutes() {
 					element={<EmpCandidateReviewPage />}
 				/>
 				<Route
-					path={employer.JOB_REVIEW}
+					path={`${employer.JOB_REVIEW}/:id`}
 					element={<EmpJobReviewPage />}
 				/>
 				<Route

@@ -170,7 +170,119 @@ exports.getAllJobs = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    res.json({ success: true, jobs });
+    res.json({ success: true, data: jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getAllEmployers = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 50 } = req.query;
+    
+    let query = {};
+    if (status) query.status = status;
+
+    const employers = await Employer.find(query)
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    res.json({ success: true, data: employers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getAllCandidates = async (req, res) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+
+    const candidates = await Candidate.find()
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    res.json({ success: true, data: candidates });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateEmployerStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const employer = await Employer.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).select('-password');
+
+    if (!employer) {
+      return res.status(404).json({ success: false, message: 'Employer not found' });
+    }
+
+    res.json({ success: true, employer });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndDelete(req.params.id);
+    
+    if (!job) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
+    }
+
+    res.json({ success: true, message: 'Job deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteCandidate = async (req, res) => {
+  try {
+    const candidate = await Candidate.findByIdAndDelete(req.params.id);
+    
+    if (!candidate) {
+      return res.status(404).json({ success: false, message: 'Candidate not found' });
+    }
+
+    res.json({ success: true, message: 'Candidate deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.deleteEmployer = async (req, res) => {
+  try {
+    const employer = await Employer.findByIdAndDelete(req.params.id);
+    
+    if (!employer) {
+      return res.status(404).json({ success: false, message: 'Employer not found' });
+    }
+
+    res.json({ success: true, message: 'Employer deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getEmployerProfile = async (req, res) => {
+  try {
+    const EmployerProfile = require('../models/EmployerProfile');
+    const profile = await EmployerProfile.findOne({ employerId: req.params.id })
+      .populate('employerId', 'name email phone companyName');
+    
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Employer profile not found' });
+    }
+
+    res.json({ success: true, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -1,401 +1,190 @@
-
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { api } from '../../../../utils/api';
 
 function AdminEmployersAllRequest() {
-	const navigate = useNavigate();
+    const navigate = useNavigate();
+    const [employers, setEmployers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-	return (
-		<>
-			<div className="wt-admin-right-page-header clearfix">
-				<h2>Employers Details</h2>
-			</div>
+    useEffect(() => {
+        fetchEmployers();
+    }, []);
 
-			<div className="panel panel-default site-bg-white">
-				<div className="panel-heading wt-panel-heading p-a20"></div>
+    const fetchEmployers = async () => {
+        try {
+            setLoading(true);
+            const response = await api.getAllEmployers();
+            if (response.success) {
+                setEmployers(response.data);
+            } else {
+                setError(response.message || 'Failed to fetch employers');
+            }
+        } catch (error) {
+            setError('Error fetching employers');
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-				<div className="panel-body wt-panel-body">
-					<div className="p-a20 table-responsive">
-						<table className="table twm-table table-striped table-borderless">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Email</th>
-									<th>Mobile Number</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
+    const handleApprove = async (employerId) => {
+        try {
+            const response = await api.updateEmployerStatus(employerId, 'approved');
+            if (response.success) {
+                setEmployers(employers.map(emp => 
+                    emp._id === employerId ? { ...emp, status: 'approved' } : emp
+                ));
+                alert('Employer approved successfully');
+            } else {
+                alert('Failed to approve employer');
+            }
+        } catch (error) {
+            alert('Error approving employer');
+            console.error('Error:', error);
+        }
+    };
 
-							<tbody>
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
-										
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
+    const handleReject = async (employerId) => {
+        try {
+            const response = await api.updateEmployerStatus(employerId, 'rejected');
+            if (response.success) {
+                setEmployers(employers.map(emp => 
+                    emp._id === employerId ? { ...emp, status: 'rejected' } : emp
+                ));
+                alert('Employer rejected successfully');
+            } else {
+                alert('Failed to reject employer');
+            }
+        } catch (error) {
+            alert('Error rejecting employer');
+            console.error('Error:', error);
+        }
+    };
 
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString();
+    };
 
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
+    if (loading) {
+        return (
+            <div className="wt-admin-right-page-header clearfix">
+                <h2>Employers Details</h2>
+                <div className="panel panel-default site-bg-white">
+                    <div className="panel-body wt-panel-body p-a20">
+                        <div className="text-center">Loading employers...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
+    return (
+        <>
+            <div className="wt-admin-right-page-header clearfix">
+                <h2>Employers Details</h2>
+            </div>
 
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
+            <div className="panel panel-default site-bg-white">
+                <div className="panel-heading wt-panel-heading p-a20">
+                    <h4 className="panel-tittle m-a0">All Employers ({employers.length})</h4>
+                </div>
 
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
+                <div className="panel-body wt-panel-body">
+                    {error && (
+                        <div className="alert alert-danger m-b20">{error}</div>
+                    )}
+                    <div className="p-a20 table-responsive">
+                        <table className="table twm-table table-striped table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Company Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
 
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
+                            <tbody>
+                                {employers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="text-center">No employers found</td>
+                                    </tr>
+                                ) : (
+                                    employers.map((employer) => (
+                                        <tr key={employer._id}>
+                                            <td>
+                                                <span className="site-text-primary">
+                                                    {employer.companyName || employer.email}
+                                                </span>
+                                            </td>
+                                            <td>{employer.email}</td>
+                                            <td>{employer.phone || 'N/A'}</td>
+                                            <td>{formatDate(employer.createdAt)}</td>
+                                            <td>
+                                                <span className={employer.status === 'approved' ? 'text-success' : 
+                                                               employer.status === 'rejected' ? 'text-danger' : 'text-warning'}>
+                                                    {employer.status || 'Pending'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "green",
+                                                        color: "#fff",
+                                                        border: "none",
+                                                        padding: "5px 10px",
+                                                        borderRadius: "4px",
+                                                        cursor: "pointer",
+                                                    }}
+                                                    onClick={() => handleApprove(employer._id)}
+                                                >
+                                                    Approve
+                                                </button>
+                                                
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "#dc3545",
+                                                        color: "#fff",
+                                                        border: "none",
+                                                        padding: "5px 10px",
+                                                        borderRadius: "4px",
+                                                        cursor: "pointer",
+                                                    }}
+                                                    className="ms-3"
+                                                    onClick={() => handleReject(employer._id)}
+                                                >
+                                                    Reject
+                                                </button>
 
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "green",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-										>
-											Approve
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#dc3545",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-										>
-											Reject
-										</button>
-
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</>
-	);
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "#5781FF",
+                                                        color: "#fff",
+                                                        border: "none",
+                                                        padding: "5px 10px",
+                                                        borderRadius: "4px",
+                                                        cursor: "pointer",
+                                                    }}
+                                                    className="ms-3"
+                                                    onClick={() => navigate(`/admin/employer-details/${employer._id}`)}
+                                                >
+                                                    View Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default AdminEmployersAllRequest;

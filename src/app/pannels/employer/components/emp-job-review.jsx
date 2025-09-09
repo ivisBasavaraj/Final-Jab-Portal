@@ -1,37 +1,42 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import JobZImage from "../../../common/jobz-img";
 import { loadScript } from "../../../../globals/constants";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function EmpJobReviewPage() {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const [jobDetails, setJobDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadScript("js/custom.js");
-    }, []);
+        fetchJobDetails();
+    }, [id]);
 
-    const jobDetails = {
-        name: "Senior Software Engineer",
-        type: "Full-Time",
-        location: "Chennai",
-        annualSalary: "8 L.P.A",
-        monthlySalary: "₹50,000",
-        vacancies: "8",
-        applicationLimit: "100",
-        backlogs: "No",
-        degrees: "B.Tech",
-        skills: "[React, Python, Node]",
-        experience: "Fresher",
-        round: "3",
-        roundTypes: "[Technical, Managerial Round, HR Round]",
-        offerLetterDate: "01-10-2025",
-        description: "We are looking for a creative and detail-oriented Senior Web Designer and Developer to lead the design and development of user-friendly, responsive websites and web applications. The ideal candidate will have a strong understanding of UI/UX principles, cross-browser compatibility, and front-end development technologies. ",
-        postedDate: "01-08-2025",
-        transportationOptions: "[One-way Cab, No Cab]",
-        status: "Active",
-        badgeClass: "twm-bg-green",
+    const fetchJobDetails = async () => {
+        try {
+            const token = localStorage.getItem('employerToken');
+            const response = await fetch(`http://localhost:5000/api/employer/jobs`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                const job = data.jobs.find(j => j._id === id);
+                setJobDetails(job);
+            }
+        } catch (error) {
+            console.error('Error fetching job:', error);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    if (loading) return <div>Loading...</div>;
+    if (!jobDetails) return <div>Job not found</div>;
 
     return (
         <>
@@ -41,7 +46,7 @@ function EmpJobReviewPage() {
                         <i className="far fa-user-circle" /> Job Details
                     </h4>
 
-                    <span className={`badge ${jobDetails.badgeClass} text-capitalize`}>
+                    <span className={`badge ${jobDetails.status === 'active' ? 'twm-bg-green' : 'twm-bg-orange'} text-capitalize`}>
                         {jobDetails.status}
                     </span>
                 </div>
@@ -59,12 +64,12 @@ function EmpJobReviewPage() {
                             <div className="col-lg-6 col-12">
                                 <div className="mt-2">
                                     <h5 className="mb-1">Job Title / Designation</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.name}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.title}</p>
                                 </div>
 
                                 <div className="mt-2">
                                     <h5 className="mb-1">Job Type</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.type}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.jobType}</p>
                                 </div>
 
                                 <div className="mt-2">
@@ -73,18 +78,13 @@ function EmpJobReviewPage() {
                                 </div>
 
                                 <div className="mt-2">
-                                    <h5 className="mb-1">CTC (Annual)</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.annualSalary}</p>
-                                </div>
-
-                                <div className="mt-2">
-                                    <h5 className="mb-1">Net Salary (Monthly)</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.monthlySalary}</p>
+                                    <h5 className="mb-1">Salary</h5>
+                                    <p className="mb-0 text-muted">{typeof jobDetails.salary === 'object' ? `${jobDetails.salary.min || ''} - ${jobDetails.salary.max || ''} ${jobDetails.salary.currency || ''}` : jobDetails.salary || 'N/A'}</p>
                                 </div>
 
                                 <div className="mt-2">
                                     <h5 className="mb-1">Experience Level</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.experience}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.experienceLevel}</p>
                                 </div>
 
                                 <div className="mt-2">
@@ -101,27 +101,27 @@ function EmpJobReviewPage() {
                             <div className="col-lg-6 col-12">
                                 <div className="mt-2">
                                     <h5 className="mb-1">Number of Vacancies</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.vacancies}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.vacancies || 'N/A'}</p>
                                 </div>
 
                                 <div className="mt-2">
-                                    <h5 className="mb-1">Application Limit</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.applicationLimit}</p>
+                                    <h5 className="mb-1">Application Count</h5>
+                                    <p className="mb-0 text-muted">{jobDetails.applicationCount || 0}</p>
                                 </div>
 
                                 <div className="mt-2">
                                     <h5 className="mb-1">Are Backlogs Allowed?</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.backlogs}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.backlogsAllowed ? 'Yes' : 'No'}</p>
                                 </div>
 
                                 <div className="mt-2">
                                     <h5 className="mb-1">Required Educational Background</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.degrees}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.education || 'N/A'}</p>
                                 </div>
 
                                 <div className="mt-2">
                                     <h5 className="mb-1">Required Skills</h5>
-                                    <p className="mb-0 text-muted">{jobDetails.skills}</p>
+                                    <p className="mb-0 text-muted">{jobDetails.requiredSkills?.join(', ') || 'N/A'}</p>
                                 </div>
 
                                 <div className="mt-2">

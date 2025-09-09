@@ -72,6 +72,21 @@ exports.loginEmployer = async (req, res) => {
 };
 
 // Profile Controllers
+exports.getProfile = async (req, res) => {
+  try {
+    const profile = await EmployerProfile.findOne({ employerId: req.user._id })
+      .populate('employerId', 'name email phone companyName');
+    
+    if (!profile) {
+      return res.json({ success: true, profile: null });
+    }
+
+    res.json({ success: true, profile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 exports.updateProfile = async (req, res) => {
   try {
     const profile = await EmployerProfile.findOneAndUpdate(
@@ -99,6 +114,24 @@ exports.uploadLogo = async (req, res) => {
     );
 
     res.json({ success: true, logo: req.file.path, profile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.uploadCover = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const profile = await EmployerProfile.findOneAndUpdate(
+      { employerId: req.user._id },
+      { coverImage: req.file.path },
+      { new: true, upsert: true }
+    );
+
+    res.json({ success: true, coverImage: req.file.path, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

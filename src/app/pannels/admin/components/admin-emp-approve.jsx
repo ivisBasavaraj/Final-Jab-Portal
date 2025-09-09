@@ -1,212 +1,122 @@
-
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { api } from '../../../../utils/api';
 
 function AdminEmployersApproved() {
     const navigate = useNavigate();
+    const [employers, setEmployers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-	return (
-		<>
-			<div className="wt-admin-right-page-header clearfix">
-				<h2>Employers Details</h2>
-			</div>
+    useEffect(() => {
+        fetchApprovedEmployers();
+    }, []);
 
-			<div className="panel panel-default site-bg-white">
-				<div className="panel-heading wt-panel-heading p-a20"></div>
+    const fetchApprovedEmployers = async () => {
+        try {
+            setLoading(true);
+            const response = await api.getAllEmployers({ status: 'approved' });
+            if (response.success) {
+                // Filter approved employers on frontend if backend doesn't support status filtering
+                const approvedEmployers = response.data.filter(emp => emp.status === 'approved');
+                setEmployers(approvedEmployers);
+            } else {
+                setError(response.message || 'Failed to fetch approved employers');
+            }
+        } catch (error) {
+            setError('Error fetching approved employers');
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-				<div className="panel-body wt-panel-body">
-					<div className="p-a20 table-responsive">
-						<table className="table twm-table table-striped table-borderless">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Email</th>
-									<th>Mobile Number</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString();
+    };
 
-							<tbody>
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
+    if (loading) {
+        return (
+            <div className="wt-admin-right-page-header clearfix">
+                <h2>Approved Employers</h2>
+                <div className="panel panel-default site-bg-white">
+                    <div className="panel-body wt-panel-body p-a20">
+                        <div className="text-center">Loading approved employers...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
+    return (
+        <>
+            <div className="wt-admin-right-page-header clearfix">
+                <h2>Approved Employers</h2>
+            </div>
 
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
+            <div className="panel panel-default site-bg-white">
+                <div className="panel-heading wt-panel-heading p-a20">
+                    <h4 className="panel-tittle m-a0">Approved Employers ({employers.length})</h4>
+                </div>
 
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
+                <div className="panel-body wt-panel-body">
+                    {error && (
+                        <div className="alert alert-danger m-b20">{error}</div>
+                    )}
+                    <div className="p-a20 table-responsive">
+                        <table className="table twm-table table-striped table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Company Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Approved Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
 
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-
-								<tr>
-									<td>
-										<a href="javascript:void(0);" className="site-text-primary">
-											Metromindz
-										</a>
-									</td>
-									<td>metromindz@gmail.com</td>
-									<td>987101512012</td>
-									<td>
-										<button
-											style={{
-												backgroundColor: "#5781FF",
-												color: "#fff",
-												border: "none",
-												padding: "5px 10px",
-												borderRadius: "4px",
-												cursor: "pointer",
-											}}
-											className="ms-3"
-												onClick={() => navigate("/admin/employer-details")}>
-												View Details
-										</button>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</>
-	);
+                            <tbody>
+                                {employers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" className="text-center">No approved employers found</td>
+                                    </tr>
+                                ) : (
+                                    employers.map((employer) => (
+                                        <tr key={employer._id}>
+                                            <td>
+                                                <span className="site-text-primary">
+                                                    {employer.companyName || employer.email}
+                                                </span>
+                                            </td>
+                                            <td>{employer.email}</td>
+                                            <td>{employer.phone || 'N/A'}</td>
+                                            <td>{formatDate(employer.updatedAt || employer.createdAt)}</td>
+                                            <td>
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "#5781FF",
+                                                        color: "#fff",
+                                                        border: "none",
+                                                        padding: "5px 10px",
+                                                        borderRadius: "4px",
+                                                        cursor: "pointer",
+                                                    }}
+                                                    className="ms-3"
+                                                    onClick={() => navigate(`/admin/employer-details/${employer._id}`)}
+                                                >
+                                                    View Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }
 
 export default AdminEmployersApproved;

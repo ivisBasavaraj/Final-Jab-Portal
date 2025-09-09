@@ -2,9 +2,41 @@ const mongoose = require('mongoose');
 
 const employerProfileSchema = new mongoose.Schema({
   employerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employer', required: true, unique: true },
+  
+  // Basic Information
+  employerCategory: { type: String },
+  companyName: { type: String },
+  phone: { type: String },
+  email: { type: String },
+  website: { type: String },
+  establishedSince: { type: String },
+  teamSize: { type: String },
+  description: { type: String },
+  
+  // Company Details
+  legalEntityCode: { type: String },
+  corporateAddress: { type: String },
+  branchLocations: { type: String },
+  officialEmail: { type: String },
+  officialMobile: { type: String },
+  companyType: { type: String },
+  cin: { type: String },
+  gstNumber: { type: String },
+  industrySector: { type: String },
+  panNumber: { type: String },
+  agreeTerms: { type: String },
+  
+  // Primary Contact
+  contactFullName: { type: String },
+  contactDesignation: { type: String },
+  contactOfficialEmail: { type: String },
+  contactMobile: { type: String },
+  alternateContact: { type: String },
+  
+  // Legacy fields
   companyDescription: { type: String },
   logo: { type: String },
-  website: { type: String },
+  coverImage: { type: String },
   industry: { type: String },
   companySize: { type: String, enum: ['1-10', '11-50', '51-200', '201-500', '500+'] },
   location: { type: String },

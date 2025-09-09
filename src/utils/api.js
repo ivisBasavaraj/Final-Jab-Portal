@@ -136,7 +136,7 @@ export const api = {
   },
 
   getEmployerDashboard: () => {
-    return fetch(`${API_BASE_URL}/employer/dashboard`, {
+    return fetch(`${API_BASE_URL}/employer/dashboard/stats`, {
       headers: getAuthHeaders('employer'),
     }).then((res) => res.json());
   },
@@ -215,6 +215,35 @@ export const api = {
   getAllJobs: (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
     return fetch(`${API_BASE_URL}/admin/jobs?${queryString}`, {
+      headers: getAuthHeaders('admin'),
+    }).then((res) => res.json());
+  },
+
+  deleteCandidate: (candidateId) => {
+    return fetch(`${API_BASE_URL}/admin/candidates/${candidateId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders('admin'),
+    }).then((res) => res.json());
+  },
+
+  updateEmployerStatus: (employerId, status) => {
+    return fetch(`${API_BASE_URL}/admin/employers/${employerId}/status`, {
+      method: 'PUT',
+      headers: getAuthHeaders('admin'),
+      body: JSON.stringify({ status }),
+    }).then((res) => res.json());
+  },
+
+  deleteEmployer: (employerId) => {
+    return fetch(`${API_BASE_URL}/admin/employers/${employerId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders('admin'),
+    }).then((res) => res.json());
+  },
+
+  adminDeleteJob: (jobId) => {
+    return fetch(`${API_BASE_URL}/admin/jobs/${jobId}`, {
+      method: 'DELETE',
       headers: getAuthHeaders('admin'),
     }).then((res) => res.json());
   },

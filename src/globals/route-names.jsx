@@ -99,7 +99,7 @@ export const admin = {
     CAN_MANAGE:   "/admin-emp-manage",
     CAN_APPROVE:   "/admin-emp-approved",
     CAN_REJECT:   "/admin-emp-rejected",
-    EMPLOYER_DETAILS:   "/employer-details"       
+    EMPLOYER_DETAILS:   "/employer-details/:id"       
 }
 
 export function pubRoute(_route) {

@@ -25,8 +25,19 @@ router.put('/users/:userType/:userId', adminController.updateUser);
 
 // Job Management Routes
 router.get('/jobs', adminController.getAllJobs);
+router.delete('/jobs/:id', adminController.deleteJob);
 router.put('/jobs/:jobId/approve', adminController.approveJob);
 router.put('/jobs/:jobId/reject', adminController.rejectJob);
+
+// Employer Management Routes
+router.get('/employers', adminController.getAllEmployers);
+router.get('/employer-profile/:id', adminController.getEmployerProfile);
+router.put('/employers/:id/status', adminController.updateEmployerStatus);
+router.delete('/employers/:id', adminController.deleteEmployer);
+
+// Candidate Management Routes
+router.get('/candidates', adminController.getAllCandidates);
+router.delete('/candidates/:id', adminController.deleteCandidate);
 
 // Content Management Routes
 router.post('/content/:type', upload.single('image'), [
