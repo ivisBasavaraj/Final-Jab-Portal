@@ -60,7 +60,7 @@ function EmployersDetail1Page() {
 												<div className="twm-employer-self-top">
 													<div className="twm-media-bg">
 														{employer.coverImage ? (
-															<img src={`http://localhost:5000/${employer.coverImage}`} alt="Company Cover" />
+															<img src={employer.coverImage} alt="Company Cover" />
 														) : (
 															<JobZImage src="images/employer-bg.jpg" alt="#" />
 														)}
@@ -68,7 +68,7 @@ function EmployersDetail1Page() {
 													<div className="twm-mid-content">
 														<div className="twm-media">
 															{employer.logo ? (
-																<img src={`http://localhost:5000/${employer.logo}`} alt="Company Logo" />
+																<img src={employer.logo} alt="Company Logo" />
 															) : (
 																<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
 															)}

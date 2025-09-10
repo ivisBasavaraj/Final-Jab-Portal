@@ -1,8 +1,26 @@
-
+import React, { useState, useEffect } from "react";
 import JobZImage from "../../../common/jobz-img";
 import NotificationBell from "../../../../components/NotificationBell";
 
 function AdminHeaderSection(props) {
+    const [adminData, setAdminData] = useState(null);
+
+    useEffect(() => {
+        fetchAdminData();
+    }, []);
+
+    const fetchAdminData = async () => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                // Decode token to get admin info
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                setAdminData({ name: 'Admin', email: 'admin@jobportal.com' });
+            }
+        } catch (error) {
+            console.error('Error fetching admin data:', error);
+        }
+    };
     return (
         <>
             <header id="header-admin-wrap" className="header-admin-fixed">
@@ -37,7 +55,7 @@ function AdminHeaderSection(props) {
                                                 {/* <a href="#" className="dropdown-toggle" id="ID-ACCOUNT_dropdown" data-bs-toggle="dropdown"> */}
                                                     <div className="">
                                                         <span>
-                                                            <JobZImage src="images/user-avtar/pic4.jpg" alt="" />
+                                                            <JobZImage src="images/user-avtar/pic4.jpg" alt="Admin" />
                                                         </span>
                                                     </div>
                                                 {/* </a> */}

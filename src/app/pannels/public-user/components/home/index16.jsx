@@ -474,7 +474,7 @@ function Home16Page() {
 											<div className="twm-jobs-grid-style1  m-b30">
 												<div className="twm-media">
 													{job.employerProfile?.logo ? (
-														<img src={`http://localhost:5000/${job.employerProfile.logo}`} alt="Company Logo" />
+														<img src={job.employerProfile.logo} alt="Company Logo" />
 													) : (
 														<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
 													)}
