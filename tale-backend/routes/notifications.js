@@ -11,4 +11,7 @@ router.patch('/:id/read', notificationController.markAsRead);
 // Mark all notifications as read for a role
 router.patch('/:role/read-all', notificationController.markAllAsRead);
 
+// Test notification creation
+router.post('/test', notificationController.testNotification);
+
 module.exports = router;

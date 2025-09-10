@@ -13,11 +13,15 @@ const NotificationBell = ({ userRole }) => {
 
   const fetchNotifications = async () => {
     try {
+      console.log('Fetching notifications for role:', userRole);
       const response = await fetch(`http://localhost:5000/api/notifications/${userRole}`);
       const data = await response.json();
+      console.log('Notifications response:', data);
       if (data.success) {
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
+      } else {
+        console.error('Failed to fetch notifications:', data.message);
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);

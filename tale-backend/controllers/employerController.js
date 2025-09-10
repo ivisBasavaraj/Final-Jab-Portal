@@ -96,15 +96,19 @@ exports.updateProfile = async (req, res) => {
     ).populate('employerId', 'name email phone companyName');
 
     // Create notification for admin when profile is updated
-    const { createNotification } = require('./notificationController');
-    await createNotification({
-      title: 'Company Profile Updated',
-      message: `${profile.companyName || 'A company'} has updated their profile`,
-      type: 'profile_submitted',
-      role: 'admin',
-      relatedId: profile._id,
-      createdBy: req.user._id
-    });
+    try {
+      const { createNotification } = require('./notificationController');
+      await createNotification({
+        title: 'Company Profile Updated',
+        message: `${profile.employerId?.companyName || 'A company'} has updated their profile`,
+        type: 'profile_submitted',
+        role: 'admin',
+        relatedId: profile._id,
+        createdBy: req.user._id
+      });
+    } catch (notifError) {
+      console.error('Notification creation failed:', notifError);
+    }
 
     res.json({ success: true, profile });
   } catch (error) {
@@ -155,15 +159,19 @@ exports.createJob = async (req, res) => {
     const job = await Job.create(jobData);
 
     // Create notification for all candidates when job is posted
-    const { createNotification } = require('./notificationController');
-    await createNotification({
-      title: 'New Job Posted',
-      message: `New ${job.title} position available at ${req.user.companyName}`,
-      type: 'job_posted',
-      role: 'candidate',
-      relatedId: job._id,
-      createdBy: req.user._id
-    });
+    try {
+      const { createNotification } = require('./notificationController');
+      await createNotification({
+        title: 'New Job Posted',
+        message: `New ${job.title} position available at ${req.user.companyName}`,
+        type: 'job_posted',
+        role: 'candidate',
+        relatedId: job._id,
+        createdBy: req.user._id
+      });
+    } catch (notifError) {
+      console.error('Notification creation failed:', notifError);
+    }
 
     res.status(201).json({ success: true, job });
   } catch (error) {
