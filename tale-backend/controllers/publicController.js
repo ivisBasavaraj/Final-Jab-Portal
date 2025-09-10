@@ -28,15 +28,22 @@ exports.getJobs = async (req, res) => {
     if (category) query.category = category;
     if (search) query.$text = { $search: search };
 
-    // Get all active jobs without employer filtering for now
+    // Get jobs only from approved employers
     const jobs = await Job.find(query)
-      .populate('employerId', 'companyName status')
+      .populate({
+        path: 'employerId',
+        select: 'companyName status',
+        match: { status: 'approved' }
+      })
       .sort({ createdAt: -1 });
+    
+    // Filter out jobs where employer is not approved
+    const approvedJobs = jobs.filter(job => job.employerId !== null);
     
     // Add employer profile data for each job
     const EmployerProfile = require('../models/EmployerProfile');
     const jobsWithProfiles = await Promise.all(
-      jobs.map(async (job) => {
+      approvedJobs.map(async (job) => {
         const employerProfile = await EmployerProfile.findOne({ employerId: job.employerId._id });
         return {
           ...job.toObject(),
