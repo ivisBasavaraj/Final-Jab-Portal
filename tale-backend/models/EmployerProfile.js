@@ -24,6 +24,11 @@ const employerProfileSchema = new mongoose.Schema({
   gstNumber: { type: String },
   industrySector: { type: String },
   panNumber: { type: String },
+  panCardImage: { type: String },
+  cinImage: { type: String },
+  gstImage: { type: String },
+  certificateOfIncorporation: { type: String },
+  authorizationLetter: { type: String },
   agreeTerms: { type: String },
   
   // Primary Contact

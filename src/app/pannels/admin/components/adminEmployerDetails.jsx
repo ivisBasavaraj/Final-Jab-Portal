@@ -79,6 +79,78 @@ function EmployerDetails() {
                     <h6>Description</h6>
                     <p>{profile.description || 'N/A'}</p>
                 </div>
+
+                <div className="mt-4">
+                    <h5>Uploaded Documents</h5>
+                    <div className="table-responsive">
+                        <table className="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Document Type</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PAN Card Image</td>
+                                    <td>{profile.panCardImage ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        {profile.panCardImage && (
+                                            <a href={`http://localhost:5000/${profile.panCardImage}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
+                                                Download
+                                            </a>
+                                        )}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>CIN Document</td>
+                                    <td>{profile.cinImage ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        {profile.cinImage && (
+                                            <a href={`http://localhost:5000/${profile.cinImage}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
+                                                Download
+                                            </a>
+                                        )}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>GST Certificate</td>
+                                    <td>{profile.gstImage ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        {profile.gstImage && (
+                                            <a href={`http://localhost:5000/${profile.gstImage}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
+                                                Download
+                                            </a>
+                                        )}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Certificate of Incorporation</td>
+                                    <td>{profile.certificateOfIncorporation ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        {profile.certificateOfIncorporation && (
+                                            <a href={`http://localhost:5000/${profile.certificateOfIncorporation}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
+                                                Download
+                                            </a>
+                                        )}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Authorization Letter</td>
+                                    <td>{profile.authorizationLetter ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        {profile.authorizationLetter && (
+                                            <a href={`http://localhost:5000/${profile.authorizationLetter}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
+                                                Download
+                                            </a>
+                                        )}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     );

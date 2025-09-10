@@ -152,6 +152,27 @@ exports.uploadCover = async (req, res) => {
   }
 };
 
+exports.uploadDocument = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const { fieldName } = req.body;
+    const updateData = { [fieldName]: req.file.path };
+
+    const profile = await EmployerProfile.findOneAndUpdate(
+      { employerId: req.user._id },
+      updateData,
+      { new: true, upsert: true }
+    );
+
+    res.json({ success: true, filePath: req.file.path, profile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Job Management Controllers
 exports.createJob = async (req, res) => {
   try {

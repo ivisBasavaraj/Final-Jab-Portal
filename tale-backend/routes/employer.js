@@ -44,6 +44,7 @@ router.get('/profile', employerController.getProfile);
 router.put('/profile', employerController.updateProfile);
 router.post('/profile/logo', upload.single('logo'), employerController.uploadLogo);
 router.post('/profile/cover', upload.single('cover'), employerController.uploadCover);
+router.post('/profile/document', upload.single('document'), employerController.uploadDocument);
 
 // Job Management Routes
 router.get('/jobs', employerController.getEmployerJobs);

@@ -115,6 +115,31 @@ function EmpCompanyProfilePage() {
         }
     };
 
+    const handleDocumentUpload = async (e, fieldName) => {
+        const file = e.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('document', file);
+            formData.append('fieldName', fieldName);
+            try {
+                const token = localStorage.getItem('employerToken');
+                const response = await fetch('http://localhost:5000/api/employer/profile/document', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    handleInputChange(fieldName, data.filePath);
+                }
+            } catch (error) {
+                console.error('Document upload failed:', error);
+            }
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -485,6 +510,81 @@ function EmpCompanyProfilePage() {
                                         onChange={(e) => handleInputChange('panNumber', e.target.value)}
                                         placeholder="Enter PAN number"
                                     />
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label>Upload PAN Card Image</label>
+                                    <input
+                                        className="form-control"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        onChange={(e) => handleDocumentUpload(e, 'panCardImage')}
+                                    />
+                                    {formData.panCardImage && (
+                                        <p className="text-success mt-1">✓ PAN Card uploaded</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label>Upload CIN Document</label>
+                                    <input
+                                        className="form-control"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        onChange={(e) => handleDocumentUpload(e, 'cinImage')}
+                                    />
+                                    {formData.cinImage && (
+                                        <p className="text-success mt-1">✓ CIN Document uploaded</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label>Upload GST Certificate</label>
+                                    <input
+                                        className="form-control"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        onChange={(e) => handleDocumentUpload(e, 'gstImage')}
+                                    />
+                                    {formData.gstImage && (
+                                        <p className="text-success mt-1">✓ GST Certificate uploaded</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label>Certificate of Incorporation (Issued by RoC)</label>
+                                    <input
+                                        className="form-control"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        onChange={(e) => handleDocumentUpload(e, 'certificateOfIncorporation')}
+                                    />
+                                    {formData.certificateOfIncorporation && (
+                                        <p className="text-success mt-1">✓ Certificate of Incorporation uploaded</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <label>Authorization Letter (if registering on behalf of someone else)</label>
+                                    <input
+                                        className="form-control"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.pdf"
+                                        onChange={(e) => handleDocumentUpload(e, 'authorizationLetter')}
+                                    />
+                                    {formData.authorizationLetter && (
+                                        <p className="text-success mt-1">✓ Authorization Letter uploaded</p>
+                                    )}
                                 </div>
                             </div>
 
