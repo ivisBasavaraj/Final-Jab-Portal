@@ -197,10 +197,12 @@ function EmpCompanyProfilePage() {
                                             src={formData.logo.startsWith('http') ? formData.logo : `http://localhost:5000/${formData.logo}`} 
                                             alt="Logo" 
                                             style={{maxWidth: '150px', maxHeight: '150px', objectFit: 'contain', border: '1px solid #ddd'}} 
-                                            onError={(e) => {console.log('Logo load error:', e.target.src); e.target.style.display = 'none';}}
-                                            onLoad={() => console.log('Logo loaded successfully')}
+                                            onError={(e) => {
+                                                console.log('Logo load error:', e.target.src); 
+                                                e.target.src = '/images/default-logo.png';
+                                            }}
                                         />
-                                        <p className="text-muted">Current logo: {formData.logo}</p>
+                                        <p className="text-muted text-success">✓ Logo uploaded successfully</p>
                                     </div>
                                 )}
                                 <p className="text-muted mt-2">
@@ -224,10 +226,12 @@ function EmpCompanyProfilePage() {
                                             src={formData.coverImage.startsWith('http') ? formData.coverImage : `http://localhost:5000/${formData.coverImage}`} 
                                             alt="Cover" 
                                             style={{maxWidth: '300px', maxHeight: '150px', objectFit: 'cover', border: '1px solid #ddd'}} 
-                                            onError={(e) => {console.log('Cover load error:', e.target.src); e.target.style.display = 'none';}}
-                                            onLoad={() => console.log('Cover loaded successfully')}
+                                            onError={(e) => {
+                                                console.log('Cover load error:', e.target.src); 
+                                                e.target.src = '/images/default-cover.png';
+                                            }}
                                         />
-                                        <p className="text-muted">Current cover: {formData.coverImage}</p>
+                                        <p className="text-muted text-success">✓ Cover image uploaded successfully</p>
                                     </div>
                                 )}
                                 <p className="text-muted mt-2">
