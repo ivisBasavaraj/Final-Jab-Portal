@@ -16,7 +16,17 @@ const marksheetStorage = multer.diskStorage({
   }
 });
 
+const profilePictureStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/profile-pictures/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+  }
+});
+
 const uploadMarksheet = multer({ storage: marksheetStorage });
+const uploadProfilePicture = multer({ storage: profilePictureStorage });
 const handleValidationErrors = require('../middlewares/validation');
 
 // Authentication Routes
@@ -52,7 +62,7 @@ router.use(auth(['candidate']));
 
 // Profile Management Routes
 router.get('/profile', candidateController.getProfile);
-router.put('/profile', candidateController.updateProfile);
+router.put('/profile', uploadProfilePicture.single('profilePicture'), candidateController.updateProfile);
 router.post('/upload-resume', upload.single('resume'), candidateController.uploadResume);
 router.post('/upload-marksheet', uploadMarksheet.single('marksheet'), candidateController.uploadMarksheet);
 

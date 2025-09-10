@@ -53,6 +53,9 @@ router.delete('/content/:type/:contentId', adminController.deleteContent);
 router.get('/contacts', adminController.getContactForms);
 router.delete('/contacts/:contactId', adminController.deleteContactForm);
 
+// Applications Routes
+router.get('/applications', adminController.getApplications);
+
 // Site Settings Routes
 router.get('/settings', adminController.getSettings);
 router.put('/settings', upload.fields([

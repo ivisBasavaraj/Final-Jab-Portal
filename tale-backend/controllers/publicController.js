@@ -8,30 +8,76 @@ const FAQ = require('../models/FAQ');
 // Job Controllers
 exports.getJobs = async (req, res) => {
   try {
-    const { location, jobType, category, search, page = 1, limit = 10 } = req.query;
+    const { location, jobType, category, search, title, employerId, page = 1, limit = 10 } = req.query;
     
-    let query = { status: 'active' };
+    // Debug: Check what's in the database
+    const allJobs = await Job.find().populate('employerId');
+    console.log('Total jobs in DB:', allJobs.length);
+    console.log('Job statuses:', allJobs.map(j => ({ status: j.status, title: j.title })));
+    
+    const allEmployers = await require('../models/Employer').find();
+    console.log('Employers:', allEmployers.map(e => ({ status: e.status, company: e.companyName })));
+    
+    let query = {}; // Remove status filter to see all jobs
+    
+    if (employerId) query.employerId = employerId;
+    if (title) query.title = new RegExp(title, 'i');
     
     if (location) query.location = new RegExp(location, 'i');
     if (jobType) query.jobType = jobType;
     if (category) query.category = category;
     if (search) query.$text = { $search: search };
 
+    // Get all active jobs without employer filtering for now
     const jobs = await Job.find(query)
-      .populate('employerId', 'companyName')
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Job.countDocuments(query);
-
+      .populate('employerId', 'companyName status')
+      .sort({ createdAt: -1 });
+    
+    // Add employer profile data for each job
+    const EmployerProfile = require('../models/EmployerProfile');
+    const jobsWithProfiles = await Promise.all(
+      jobs.map(async (job) => {
+        const employerProfile = await EmployerProfile.findOne({ employerId: job.employerId._id });
+        return {
+          ...job.toObject(),
+          employerProfile: employerProfile
+        };
+      })
+    );
+    
+    console.log('Active jobs found:', jobs.length);
+    
     res.json({
       success: true,
-      jobs,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total
+      jobs: jobsWithProfiles,
+      total: jobsWithProfiles.length
     });
+  } catch (error) {
+    console.error('Error in getJobs:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getJobById = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id)
+      .populate('employerId', 'companyName email phone');
+    
+    if (!job) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
+    }
+
+    // Get employer profile for logo and cover image
+    const EmployerProfile = require('../models/EmployerProfile');
+    const employerProfile = await EmployerProfile.findOne({ employerId: job.employerId._id });
+    
+    // Add profile data to job object
+    const jobWithProfile = {
+      ...job.toObject(),
+      employerProfile: employerProfile
+    };
+
+    res.json({ success: true, job: jobWithProfile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -55,10 +101,17 @@ exports.searchJobs = async (req, res) => {
     if (jobType) query.jobType = jobType;
 
     const jobs = await Job.find(query)
-      .populate('employerId', 'companyName')
+      .populate({
+        path: 'employerId',
+        select: 'companyName status',
+        match: { status: 'approved' }
+      })
       .sort({ createdAt: -1 });
 
-    res.json({ success: true, jobs });
+    // Filter out jobs where employer is not approved
+    const filteredJobs = jobs.filter(job => job.employerId);
+
+    res.json({ success: true, jobs: filteredJobs });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -172,6 +225,47 @@ exports.getPublicStats = async (req, res) => {
         totalApplications,
       },
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getEmployerProfile = async (req, res) => {
+  try {
+    const EmployerProfile = require('../models/EmployerProfile');
+    const Employer = require('../models/Employer');
+    
+    let profile = await EmployerProfile.findOne({ employerId: req.params.id })
+      .populate('employerId', 'name email phone companyName');
+    
+    // If no profile exists, create basic profile from employer data
+    if (!profile) {
+      const employer = await Employer.findById(req.params.id);
+      if (!employer) {
+        return res.status(404).json({ success: false, message: 'Employer not found' });
+      }
+      
+      profile = {
+        employerId: employer,
+        companyName: employer.companyName,
+        email: employer.email,
+        phone: employer.phone,
+        description: 'No company description available.'
+      };
+    }
+
+    res.json({ success: true, profile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.getEmployers = async (req, res) => {
+  try {
+    const Employer = require('../models/Employer');
+    const employers = await Employer.find({ status: 'approved' }).select('-password');
+    
+    res.json({ success: true, employers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

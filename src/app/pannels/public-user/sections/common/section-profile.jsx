@@ -1,4 +1,4 @@
-function SectionProfile() {
+function SectionProfile({ employer }) {
     return (
         <>
             <h4 className="section-head-small mb-4">Profile Info</h4>
@@ -8,7 +8,7 @@ function SectionProfile() {
                         <div className="twm-s-info-inner">
                             <i className="fas fa-money-bill-wave" />
                             <span className="twm-title">Company Type</span>
-                            <div className="twm-s-info-discription">IT</div>
+                            <div className="twm-s-info-discription">{employer?.industrySector || employer?.companyType || 'Not specified'}</div>
                         </div>
                     </li>
 
@@ -16,7 +16,7 @@ function SectionProfile() {
                         <div className="twm-s-info-inner">
                             <i className="fas fa-clock" />
                             <span className="twm-title">Established Year</span>
-                            <div className="twm-s-info-discription">2017</div>
+                            <div className="twm-s-info-discription">{employer?.establishedSince || 'Not specified'}</div>
                         </div>
                     </li>
 
@@ -32,7 +32,7 @@ function SectionProfile() {
                         <div className="twm-s-info-inner">
                             <i className="fas fa-mobile-alt" />
                             <span className="twm-title">Official Mobile Number</span>
-                            <div className="twm-s-info-discription">+91987654321</div>
+                            <div className="twm-s-info-discription">{employer?.officialMobile || employer?.phone || 'Not specified'}</div>
                         </div>
                     </li>
 
@@ -40,7 +40,7 @@ function SectionProfile() {
                         <div className="twm-s-info-inner">
                             <i className="fas fa-at" />
                             <span className="twm-title">Official Email ID</span>
-                            <div className="twm-s-info-discription">metromindz@gmail.com</div>
+                            <div className="twm-s-info-discription">{employer?.officialEmail || employer?.email || 'Not specified'}</div>
                         </div>
                     </li>
 
@@ -48,7 +48,7 @@ function SectionProfile() {
                         <div className="twm-s-info-inner">
                             <i className="fas fa-book-reader" />
                             <span className="twm-title">Company Size</span>
-                            <div className="twm-s-info-discription">50-100 employees</div>
+                            <div className="twm-s-info-discription">{employer?.teamSize || 'Not specified'}</div>
                         </div>
                     </li>
 
@@ -56,7 +56,7 @@ function SectionProfile() {
                         <div className="twm-s-info-inner">
                             <i className="fas fa-map-marker-alt" />
                             <span className="twm-title">Corporate Office Addres</span>
-                            <div className="twm-s-info-discription">Sahakar Nagar, Bangalore 562062</div>
+                            <div className="twm-s-info-discription">{employer?.corporateAddress || 'Not specified'}</div>
                         </div>
                     </li>
                 </ul>

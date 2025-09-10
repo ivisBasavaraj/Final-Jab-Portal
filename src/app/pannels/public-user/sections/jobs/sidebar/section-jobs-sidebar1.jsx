@@ -4,12 +4,27 @@ import { publicUser } from "../../../../../../globals/route-names";
 import SectionSideAdvert from "./section-side-advert";
 import { useState, useEffect } from "react";
 
-function SectionJobsSidebar1 () {
+function SectionJobsSidebar1 ({ onFilterChange }) {
     const [jobTypes, setJobTypes] = useState([]);
+    const [jobTitles, setJobTitles] = useState([]);
+    const [filters, setFilters] = useState({
+        keyword: '',
+        location: '',
+        jobType: [],
+        employmentType: '',
+        jobTitle: ''
+    });
 
     useEffect(() => {
         fetchJobTypes();
+        fetchJobTitles();
     }, []);
+
+    useEffect(() => {
+        if (onFilterChange) {
+            onFilterChange(filters);
+        }
+    }, [filters, onFilterChange]);
 
     const fetchJobTypes = async () => {
         try {
@@ -29,6 +44,20 @@ function SectionJobsSidebar1 () {
         }
     };
 
+    const fetchJobTitles = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/public/jobs');
+            const data = await response.json();
+            if (data.success) {
+                // Get unique job titles
+                const titles = [...new Set(data.jobs.map(job => job.title))];
+                setJobTitles(titles);
+            }
+        } catch (error) {
+            console.error('Error fetching job titles:', error);
+        }
+    };
+
     return (
         <>
             <div className="side-bar">
@@ -36,11 +65,17 @@ function SectionJobsSidebar1 () {
                     <form>
                         <div className="form-group mb-4">
                             <h4 className="section-head-small mb-4">Job Title</h4>
-                            <select className="wt-select-bar-large selectpicker" data-live-search="true" data-bv-field="size">
-                                <option>All Category</option>
-                                <option>Web Designer</option>
-                                <option>Developer</option>
-                                <option>Acountant</option>
+                            <select 
+                                className="wt-select-bar-large selectpicker" 
+                                data-live-search="true" 
+                                data-bv-field="size"
+                                value={filters.jobTitle}
+                                onChange={(e) => setFilters({...filters, jobTitle: e.target.value})}
+                            >
+                                <option value="">All Category</option>
+                                {jobTitles.map((title, index) => (
+                                    <option key={index} value={title}>{title}</option>
+                                ))}
                             </select>
                         </div>
 
@@ -48,7 +83,13 @@ function SectionJobsSidebar1 () {
                         <div className="form-group mb-4">
                             <h4 className="section-head-small mb-4">Keyword</h4>
                             <div className="input-group">
-                                <input type="text" className="form-control" placeholder="Job title or Keyword" />
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    placeholder="Job title or Keyword" 
+                                    value={filters.keyword}
+                                    onChange={(e) => setFilters({...filters, keyword: e.target.value})}
+                                />
                                 <button className="btn" type="button"><i className="feather-search" /></button>
                             </div>
                         </div>
@@ -56,7 +97,13 @@ function SectionJobsSidebar1 () {
                         <div className="form-group mb-4">
                             <h4 className="section-head-small mb-4">Location</h4>
                             <div className="input-group">
-                                <input type="text" className="form-control" placeholder="Search location" />
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    placeholder="Search location" 
+                                    value={filters.location}
+                                    onChange={(e) => setFilters({...filters, location: e.target.value})}
+                                />
                                 <button className="btn" type="button"><i className="feather-map-pin" /></button>
                             </div>
                         </div>
@@ -67,7 +114,18 @@ function SectionJobsSidebar1 () {
                                 {jobTypes.map(([type, count], index) => (
                                     <li key={type}>
                                         <div className=" form-check">
-                                            <input type="checkbox" className="form-check-input" id={`jobType${index}`} />
+                                            <input 
+                                                type="checkbox" 
+                                                className="form-check-input" 
+                                                id={`jobType${index}`}
+                                                checked={filters.jobType.includes(type)}
+                                                onChange={(e) => {
+                                                    const newJobTypes = e.target.checked 
+                                                        ? [...filters.jobType, type]
+                                                        : filters.jobType.filter(t => t !== type);
+                                                    setFilters({...filters, jobType: newJobTypes});
+                                                }}
+                                            />
                                             <label className="form-check-label" htmlFor={`jobType${index}`}>
                                                 {type.charAt(0).toUpperCase() + type.slice(1).replace('-', ' ')}
                                             </label>

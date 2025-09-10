@@ -1,23 +1,34 @@
 import JobZImage from "../../../../common/jobz-img";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { publicUser } from "../../../../../globals/route-names";
 import SectionPagination from "../common/section-pagination";
 import { useState, useEffect } from "react";
 
-function SectionJobsGrid() {
+function SectionJobsGrid({ filters }) {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchJobs();
-    }, []);
+    }, [filters]);
 
     const fetchJobs = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/public/jobs');
+            const params = new URLSearchParams();
+            if (filters?.keyword) params.append('search', filters.keyword);
+            if (filters?.location) params.append('location', filters.location);
+            if (filters?.jobTitle) params.append('title', filters.jobTitle);
+            if (filters?.jobType?.length > 0) {
+                filters.jobType.forEach(type => params.append('jobType', type));
+            }
+            
+            const response = await fetch(`http://localhost:5000/api/public/jobs?${params.toString()}`);
             const data = await response.json();
+            console.log('Jobs API response:', data);
             if (data.success) {
-                setJobs(data.jobs);
+                setJobs(data.jobs || data.data || []);
+            } else {
+                console.error('API returned error:', data.message);
             }
         } catch (error) {
             console.error('Error fetching jobs:', error);
@@ -37,7 +48,11 @@ function SectionJobsGrid() {
                     <div key={job._id} className="col-lg-6 col-md-12 m-b30">
                         <div className="twm-jobs-grid-style1">
                             <div className="twm-media">
-                                <JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+                                {job.employerProfile?.logo ? (
+                                    <img src={`http://localhost:5000/${job.employerProfile.logo}`} alt="Company Logo" />
+                                ) : (
+                                    <JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+                                )}
                             </div>
 
                             <div className="twm-jobs-category green">

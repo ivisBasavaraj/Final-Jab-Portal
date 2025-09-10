@@ -2,14 +2,14 @@ import SectionContact from "./section-contact";
 import SectionLocation from "./section-location";
 import SectionProfile from "./section-profile";
 
-function SectionEmployersCandidateSidebar({ type }) {
+function SectionEmployersCandidateSidebar({ type, employer }) {
     return (
 			<>
 				<div className="side-bar-2">
 					{type === "1" ? (
 						<>
 							<div className="twm-s-info-wrap mb-5">
-								<SectionProfile />
+								<SectionProfile employer={employer} />
 							</div>
 							
 							<div className="twm-s-map mb-5">
@@ -19,7 +19,7 @@ function SectionEmployersCandidateSidebar({ type }) {
 					) : (
 						<>
 							<div className="twm-s-map mb-5">
-								<SectionProfile />
+								<SectionProfile employer={employer} />
 							</div>
 							<div className="twm-s-info-wrap mb-5">
 								<SectionLocation />

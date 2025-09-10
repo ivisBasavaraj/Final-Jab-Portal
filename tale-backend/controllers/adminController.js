@@ -426,3 +426,20 @@ exports.getSettings = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+exports.getApplications = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const filter = status ? { status } : {};
+    
+    const applications = await Application.find(filter)
+      .populate('candidateId', 'name email phone')
+      .populate('employerId', 'companyName email')
+      .populate('jobId', 'title location')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: applications });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

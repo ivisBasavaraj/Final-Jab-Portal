@@ -1,5 +1,6 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { loadScript } from "../../../../../globals/constants";
 import JobZImage from "../../../../common/jobz-img";
 import ApplyJobPopup from "../../../../common/popups/popup-apply-job";
@@ -10,6 +11,16 @@ import SectionShareProfile from "../../sections/common/section-share-profile";
 import SectionJobsSidebar2 from "../../sections/jobs/sidebar/section-jobs-sidebar2";
 
 function JobDetail1Page() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [job, setJob] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem('candidateToken');
+        setIsLoggedIn(!!token);
+    }, []);
 
     const sidebarConfig = {
         showJobInfo: true
@@ -17,7 +28,41 @@ function JobDetail1Page() {
 
     useEffect(()=>{
         loadScript("js/custom.js");
-    })
+        if (id) {
+            fetchJobDetails();
+        }
+    }, [id]);
+
+    const fetchJobDetails = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/public/jobs/${id}`);
+            const data = await response.json();
+            if (data.success) {
+                setJob(data.job);
+            }
+        } catch (error) {
+            console.error('Error fetching job details:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="text-center p-5">Loading job details...</div>;
+    }
+
+    if (!job) {
+        return <div className="text-center p-5">Job not found</div>;
+    }
+
+    const handleApplyClick = () => {
+        if (!isLoggedIn) {
+            navigate('/login', { state: { returnUrl: `/job-detail/${id}` } });
+        } else {
+            // Handle job application logic here
+            alert('Application submitted successfully!');
+        }
+    };
 
     return (
 			<>
@@ -33,7 +78,11 @@ function JobDetail1Page() {
 											<div className="twm-job-self-info">
 												<div className="twm-job-self-top">
 													<div className="twm-media-bg">
-														<JobZImage src="images/job-detail-bg.jpg" alt="#" />
+														{job.employerProfile?.coverImage ? (
+															<img src={`http://localhost:5000/${job.employerProfile.coverImage}`} alt="Company Cover" />
+														) : (
+															<JobZImage src="images/job-detail-bg.jpg" alt="#" />
+														)}
 														<div className="twm-jobs-category green">
 															<span className="twm-bg-green">New</span>
 														</div>
@@ -41,18 +90,20 @@ function JobDetail1Page() {
 
 													<div className="twm-mid-content">
 														<div className="twm-media">
-															<JobZImage
-																src="images/jobs-company/pic1.jpg"
-																alt="#"
-															/>
+															{job.employerProfile?.logo ? (
+																<img src={`http://localhost:5000/${job.employerProfile.logo}`} alt="Company Logo" />
+															) : (
+																<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+															)}
 														</div>
 
 														<h4 className="twm-job-title">
-															Senior Developer {" "}
-															{/* <span className="twm-job-post-duration">
-																/ 1 days ago
-															</span> */}
+															{job.title}
+															<span className="twm-job-post-duration">
+																/ {new Date(job.createdAt).toLocaleDateString()}
+															</span>
 														</h4>
+														<p className="twm-job-address"><i className="feather-map-pin" />{job.location}</p>
 														{/* <p className="twm-job-address"><i className="feather-map-pin" />#56 Sunset Blvd Sahakar Nagar, Bengaluru, 560902</p> */}
 														{/* <div className="twm-job-self-mid">
                                                         <div className="twm-job-self-mid-left">
@@ -64,14 +115,12 @@ function JobDetail1Page() {
                                                         </div>
                                                     </div> */}
 														<div className="twm-job-self-bottom">
-															<a
+															<button
 																className="site-button"
-																// data-bs-toggle="modal"
-																// href="#apply_job_popup"
-																role="button"
+																onClick={handleApplyClick}
 															>
-																Apply Now
-															</a>
+																{isLoggedIn ? 'Apply Now' : 'Login to Apply'}
+															</button>
 														</div>
 													</div>
 												</div>
@@ -79,38 +128,33 @@ function JobDetail1Page() {
 										</div>
 
 										<h4 className="twm-s-title">Job Description:</h4>
-										<p>
-											We are looking for a creative and detail-oriented Senior
-											Web Designer and Developer to lead the design and
-											development of user-friendly, responsive websites and web
-											applications. The ideal candidate will have a strong
-											understanding of UI/UX principles, cross-browser
-											compatibility, and front-end development technologies.
-										</p>
+										<p>{job.description}</p>
+										
+										<div className="row">
+											<div className="col-md-6">
+												<h5>Job Type:</h5> <p>{job.jobType}</p>
+												<h5>Vacancies:</h5> <p>{job.vacancies || 'Not specified'}</p>
+												<h5>Education:</h5> <p>{job.education || 'Not specified'}</p>
+											</div>
+											<div className="col-md-6">
+												<h5>Experience Level:</h5> <p>{job.experienceLevel || 'Not specified'}</p>
+												<h5>Min Experience:</h5> <p>{job.minExperience || 0} years</p>
+												<h5>Backlogs Allowed:</h5> <p>{job.backlogsAllowed ? 'Yes' : 'No'}</p>
+											</div>
+										</div>
 
-										<h4 className="twm-s-title">Requirements:</h4>
+										<h4 className="twm-s-title">Required Skills:</h4>
 										<ul className="description-list-2">
-											<li>
-												<i className="feather-check" />
-												Must be able to communicate with others to convey
-												information effectively.
-											</li>
-											
-											<li>
-												<i className="feather-check" />
-												Rachelor or Master degree level educational background.
-											</li>
-
-											<li>
-												<i className="feather-check" />4 years relevant PHP dev
-												experience.
-											</li>
-
-											<li>
-												<i className="feather-check" />
-												Troubleshooting, testing and maintaining the core
-												product software and databases.
-											</li>
+											{job.requiredSkills && job.requiredSkills.length > 0 ? (
+												job.requiredSkills.map((skill, index) => (
+													<li key={index}>
+														<i className="feather-check" />
+														{skill}
+													</li>
+												))
+											) : (
+												<li><i className="feather-check" />No specific skills mentioned</li>
+											)}
 										</ul>
 
 										<h4 className="twm-s-title">Responsibilities:</h4>
@@ -177,7 +221,7 @@ function JobDetail1Page() {
 								</div>
 								
 								<div className="col-lg-4 col-md-12 rightSidebar">
-									<SectionJobsSidebar2 _config={sidebarConfig} />
+									<SectionJobsSidebar2 _config={sidebarConfig} job={job} />
 								</div>
 							</div>
 						</div>

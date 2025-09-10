@@ -18,15 +18,15 @@ function CanMyResumePage() {
     const [loading, setLoading] = useState(true);
     
     useEffect(()=>{
-        loadScript("js/custom.js")
         fetchProfile();
     }, [])
 
     const fetchProfile = async () => {
         try {
             const response = await api.getCandidateProfile();
+            console.log('Resume profile response:', response);
             if (response.success) {
-                setProfile(response.data);
+                setProfile(response.profile);
             }
         } catch (error) {
             console.error('Error fetching profile:', error);

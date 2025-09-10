@@ -4,14 +4,47 @@ import SectionShareProfile from "../../sections/common/section-share-profile";
 import SectionOfficePhotos1 from "../../sections/common/section-office-photos1";
 import SectionOfficeVideo1 from "../../sections/common/section-office-video1";
 import SectionAvailableJobsList from "../../sections/employers/detail/section-available-jobs-list";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { loadScript } from "../../../../../globals/constants";
 
 function EmployersDetail1Page() {
+    const { id } = useParams();
+    const [employer, setEmployer] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(()=>{
-        loadScript("js/custom.js")
-    })
+        loadScript("js/custom.js");
+        if (id) {
+            fetchEmployerDetails();
+        }
+    }, [id]);
+
+    const fetchEmployerDetails = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/public/employers/${id}`);
+            const data = await response.json();
+            console.log('Employer API response:', data);
+            if (data.success) {
+                setEmployer(data.profile);
+                console.log('Employer data set:', data.profile);
+            } else {
+                console.error('API error:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching employer details:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="text-center p-5">Loading employer details...</div>;
+    }
+
+    if (!employer) {
+        return <div className="text-center p-5">Employer not found</div>;
+    }
 
     return (
 			<>
@@ -26,21 +59,26 @@ function EmployersDetail1Page() {
 											<div className="twm-employer-self-info">
 												<div className="twm-employer-self-top">
 													<div className="twm-media-bg">
-														<JobZImage src="images/employer-bg.jpg" alt="#" />
+														{employer.coverImage ? (
+															<img src={`http://localhost:5000/${employer.coverImage}`} alt="Company Cover" />
+														) : (
+															<JobZImage src="images/employer-bg.jpg" alt="#" />
+														)}
 													</div>
 													<div className="twm-mid-content">
 														<div className="twm-media">
-															<JobZImage
-																src="images/jobs-company/pic1.jpg"
-																alt="#"
-															/>
+															{employer.logo ? (
+																<img src={`http://localhost:5000/${employer.logo}`} alt="Company Logo" />
+															) : (
+																<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+															)}
 														</div>
 														<h4 className="twm-job-title">
-															Galaxy Software Development
+															{employer.employerId?.companyName || employer.companyName || 'Company Name'}
 														</h4>
 														<p className="twm-employer-address">
 															<i className="feather-map-pin" />
-															Sahakar Nagar, Bangalore
+															{employer.corporateAddress || employer.location || 'Location not specified'}
 														</p>
 														{/* <a href="https://themeforest.net/user/thewebmax/portfolio" className="twm-employer-websites site-text-primary">https://thewebmax.com</a> */}
 														{/* <div className="twm-employer-self-bottom">
@@ -86,8 +124,7 @@ function EmployersDetail1Page() {
 											>
 												<h4 className="twm-s-title">About Company</h4>
 												<p>
-													We are a dynamic organization committed to delivering
-													innovative solutions and exceptional services...
+													{employer.description || employer.companyDescription || 'No company description available.'}
 												</p>
 
 												<h4 className="twm-s-title">Why Join Us</h4>
@@ -113,8 +150,7 @@ function EmployersDetail1Page() {
 											</div>
 
 											<div className="tab-pane fade" id="jobs" role="tabpanel">
-												{/* You can import and place SectionAvailableJobsList here */}
-												<SectionAvailableJobsList />
+												<SectionAvailableJobsList employerId={id} />
 											</div>
 										</div>
 
@@ -136,7 +172,7 @@ function EmployersDetail1Page() {
 								</div>
 
 								<div className="col-lg-4 col-md-12 rightSidebar">
-									<SectionEmployersCandidateSidebar type="1" />
+									<SectionEmployersCandidateSidebar type="1" employer={employer} />
 								</div>
 							</div>
 						</div>

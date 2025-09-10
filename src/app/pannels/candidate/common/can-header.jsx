@@ -1,10 +1,39 @@
 // CANDIDATE DASHBOARD HEADER
 
+import React, { useState, useEffect } from "react";
 import JobZImage from "../../../common/jobz-img";
 import { NavLink } from "react-router-dom";
 import { canRoute, candidate } from "../../../../globals/route-names";
+import { api } from "../../../../utils/api";
 
 function CanHeaderSection(props) {
+    const [profileData, setProfileData] = useState(null);
+
+    useEffect(() => {
+        fetchProfile();
+        
+        // Listen for profile updates
+        const handleProfileUpdate = () => {
+            fetchProfile();
+        };
+        
+        window.addEventListener('profileUpdated', handleProfileUpdate);
+        
+        return () => {
+            window.removeEventListener('profileUpdated', handleProfileUpdate);
+        };
+    }, []);
+
+    const fetchProfile = async () => {
+        try {
+            const response = await api.getCandidateProfile();
+            if (response.success && response.profile) {
+                setProfileData(response.profile);
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+        }
+    };
     return (
         <>
             <header id="header-admin-wrap" className="header-admin-fixed">
@@ -81,7 +110,15 @@ function CanHeaderSection(props) {
                                         <div className="listing-user">
                                             <div className="">
                                                 <span>
-                                                    <JobZImage src="images/user-avtar/pic4.jpg" alt="" />
+                                                    {profileData?.profilePicture ? (
+                                                        <img 
+                                                            src={`http://localhost:5000/${profileData.profilePicture}`} 
+                                                            alt="Profile" 
+                                                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                                                        />
+                                                    ) : (
+                                                        <JobZImage src="images/user-avtar/pic4.jpg" alt="" />
+                                                    )}
                                                 </span>
                                             </div>
                                             </div>

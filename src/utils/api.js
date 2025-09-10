@@ -66,10 +66,16 @@ export const api = {
   },
 
   updateCandidateProfile: (data) => {
+    const token = localStorage.getItem('candidateToken');
+    const isFormData = data instanceof FormData;
+    
     return fetch(`${API_BASE_URL}/candidate/profile`, {
       method: 'PUT',
-      headers: getAuthHeaders('candidate'),
-      body: JSON.stringify(data),
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      },
+      body: isFormData ? data : JSON.stringify(data),
     }).then((res) => res.json());
   },
 

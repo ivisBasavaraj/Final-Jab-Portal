@@ -86,9 +86,10 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     console.log('Request body:', req.body);
+    console.log('Request file:', req.file);
     console.log('User ID:', req.user._id);
     
-    const { name, phone, email, profilePicture, ...profileData } = req.body;
+    const { name, phone, email, ...profileData } = req.body;
     
     // Update candidate basic info
     if (name || phone || email) {
@@ -100,10 +101,16 @@ exports.updateProfile = async (req, res) => {
       console.log('Updated candidate:', updatedCandidate);
     }
     
-    // Update profile data (excluding profilePicture for now)
+    // Prepare profile update data
+    const updateData = { ...profileData };
+    if (req.file) {
+      updateData.profilePicture = req.file.path;
+    }
+    
+    // Update profile data
     const profile = await CandidateProfile.findOneAndUpdate(
       { candidateId: req.user._id },
-      profileData,
+      updateData,
       { new: true, upsert: true }
     ).populate('candidateId', 'name email phone');
     

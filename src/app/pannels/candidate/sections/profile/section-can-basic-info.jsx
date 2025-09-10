@@ -10,6 +10,8 @@ function SectionCandicateBasicInfo() {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [currentProfilePicture, setCurrentProfilePicture] = useState(null);
 
     useEffect(() => {
         fetchProfile();
@@ -18,13 +20,19 @@ function SectionCandicateBasicInfo() {
     const fetchProfile = async () => {
         try {
             const response = await api.getCandidateProfile();
+            console.log('Profile response:', response);
+            
             if (response.success && response.profile) {
+                const profile = response.profile;
+                const candidate = profile.candidateId || {};
+                
                 setFormData({
-                    name: response.profile.name || '',
-                    phone: response.profile.phone || '',
-                    email: response.profile.email || '',
+                    name: candidate.name || '',
+                    phone: candidate.phone || '',
+                    email: candidate.email || '',
                     profilePicture: null
                 });
+                setCurrentProfilePicture(profile.profilePicture);
             }
         } catch (error) {
             console.error('Error fetching profile:', error);
@@ -42,23 +50,47 @@ function SectionCandicateBasicInfo() {
     };
 
     const handleFileChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            profilePicture: e.target.files[0]
-        }));
+        const file = e.target.files[0];
+        if (file) {
+            setFormData(prev => ({
+                ...prev,
+                profilePicture: file
+            }));
+            
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
         
-        console.log('Form data being sent:', formData);
-        
         try {
-            const response = await api.updateCandidateProfile(formData);
+            const submitData = new FormData();
+            submitData.append('name', formData.name);
+            submitData.append('phone', formData.phone);
+            submitData.append('email', formData.email);
+            if (formData.profilePicture) {
+                submitData.append('profilePicture', formData.profilePicture);
+            }
+            
+            console.log('Form data being sent:', formData);
+            
+            const response = await api.updateCandidateProfile(submitData);
             console.log('API response:', response);
             if (response.success) {
                 alert('Profile updated successfully!');
+                // Refresh profile data to show updated image
+                fetchProfile();
+                // Clear image preview
+                setImagePreview(null);
+                // Trigger header refresh
+                window.dispatchEvent(new Event('profileUpdated'));
             } else {
                 alert('Failed to update profile: ' + (response.message || 'Unknown error'));
             }
@@ -96,6 +128,26 @@ function SectionCandicateBasicInfo() {
                                 accept="image/*"
                                 onChange={handleFileChange}
                             />
+                            {/* Image Preview */}
+                            <div className="mt-2">
+                                {imagePreview ? (
+                                    <img 
+                                        src={imagePreview} 
+                                        alt="Preview" 
+                                        style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+                                    />
+                                ) : currentProfilePicture ? (
+                                    <img 
+                                        src={`http://localhost:5000/${currentProfilePicture}`} 
+                                        alt="Current Profile" 
+                                        style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+                                    />
+                                ) : (
+                                    <div style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        No Image
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="col-md-6">

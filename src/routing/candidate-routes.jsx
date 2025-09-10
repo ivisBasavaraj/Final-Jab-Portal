@@ -21,6 +21,7 @@ import AssessmentResults from "../app/pannels/candidate/pages/assessment-result"
 function CandidateRoutes() {
     return (
 			<Routes>
+				<Route path={candidate.INITIAL} element={<CanDashboardPage />} />
 				<Route path={candidate.DASHBOARD} element={<CanDashboardPage />} />
 				<Route path={candidate.PROFILE} element={<CanProfilePage />} />
 				<Route path={candidate.APPLIED_JOBS} element={<CanAppliedJobs />} />

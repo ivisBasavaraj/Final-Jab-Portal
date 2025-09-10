@@ -42,6 +42,13 @@ function AdminSidebarSection(props) {
                                 <li><NavLink to={adminRoute(admin.CAN_REJECT)} id="rejectedList"><span className="admin-nav-text">Rejected</span></NavLink></li>
                             </ul>
                         </li>
+
+                        <li className={setMenuActive(currentpath, '/admin/shortlisted')}>
+                            <NavLink to="/admin/shortlisted">
+                                <i className="fa fa-star" />
+                                <span className="admin-nav-text">Shortlisted Candidates</span>
+                            </NavLink>
+                        </li>
     
                         <li>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#logout-dash-profile">

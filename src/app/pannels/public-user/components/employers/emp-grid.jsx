@@ -27,19 +27,28 @@ function EmployersGridPage() {
 
     const fetchEmployers = async () => {
         try {
-            const data = await api.getAdminUsers({ type: 'employers' });
+            const response = await fetch('http://localhost:5000/api/public/employers');
+            const data = await response.json();
             if (data.success) {
-                // Get job counts for each employer
-                const employersWithJobs = await Promise.all(
-                    data.users.map(async (employer) => {
-                        const jobsData = await api.getJobs({ employerId: employer._id });
+                // Get profiles and job counts for each employer
+                const employersWithData = await Promise.all(
+                    data.employers.map(async (employer) => {
+                        // Get employer profile
+                        const profileResponse = await fetch(`http://localhost:5000/api/public/employers/${employer._id}`);
+                        const profileData = await profileResponse.json();
+                        
+                        // Get job count
+                        const jobsResponse = await fetch(`http://localhost:5000/api/public/jobs?employerId=${employer._id}`);
+                        const jobsData = await jobsResponse.json();
+                        
                         return {
                             ...employer,
+                            profile: profileData.success ? profileData.profile : null,
                             jobCount: jobsData.success ? jobsData.jobs.length : 0
                         };
                     })
                 );
-                setEmployers(employersWithJobs);
+                setEmployers(employersWithData);
             }
         } catch (error) {
             console.error('Error fetching employers:', error);
@@ -70,27 +79,28 @@ function EmployersGridPage() {
                                         <div key={employer._id} className="col-lg-6 col-md-6">
                                             <div className="twm-employer-grid-style1 mb-5">
                                                 <div className="twm-media">
-                                                    <JobZImage
-                                                        src="images/jobs-company/pic1.jpg"
-                                                        alt="#"
-                                                    />
+                                                    {employer.profile?.logo ? (
+                                                        <img src={`http://localhost:5000/${employer.profile.logo}`} alt="Company Logo" />
+                                                    ) : (
+                                                        <JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+                                                    )}
                                                 </div>
                                                 <div className="twm-mid-content">
                                                     <NavLink
-                                                        to={`${publicUser.employer.DETAIL1}/${employer._id}`}
+                                                        to={`/emp-detail/${employer._id}`}
                                                         className="twm-job-title"
                                                     >
                                                         <h4>{employer.companyName}</h4>
                                                     </NavLink>
                                                     <div className="twm-job-address">
                                                         <i className="feather-map-pin" />
-                                                        &nbsp; {employer.phone || 'Location not specified'}
+                                                        &nbsp; {employer.profile?.corporateAddress || 'Location not specified'}
                                                     </div>
                                                     <NavLink
-                                                        to={`${publicUser.employer.DETAIL1}/${employer._id}`}
+                                                        to={`/emp-detail/${employer._id}`}
                                                         className="twm-job-websites site-text-primary"
                                                     >
-                                                        {employer.email}
+                                                        {employer.profile?.website || employer.email}
                                                     </NavLink>
                                                 </div>
                                                 <div className="twm-right-content">

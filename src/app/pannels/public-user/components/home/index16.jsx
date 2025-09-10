@@ -125,9 +125,9 @@ function Home16Page() {
 
 											{/*Find job btn*/}
 											<div className="form-group col-xl-3 col-lg-6 col-md-6">
-												<button type="button" className="site-button">
+												<NavLink to="/job-grid" className="site-button">
 													Find Job
-												</button>
+												</NavLink>
 											</div>
 										</div>
 									</form>
@@ -160,9 +160,9 @@ function Home16Page() {
 											<div className="twm-content">
 												<div className="tw-count-number text-clr-sky">
 													<span className="counter">
-														<CountUp end={2} duration={10} />
+														<CountUp end={stats.totalEmployers || 2} duration={10} />
 													</span>
-													K+
+													+
 												</div>
 												<p className="icon-content-info">Companies</p>
 											</div>
@@ -186,11 +186,11 @@ function Home16Page() {
 											<div className="twm-content">
 												<div className="tw-count-number text-clr-green">
 													<span className="counter">
-														<CountUp end={3} duration={10} />
+														<CountUp end={stats.totalApplications || 3} duration={10} />
 													</span>
-													K+
+													+
 												</div>
-												<p className="icon-content-info">Selections</p>
+												<p className="icon-content-info">Applications</p>
 											</div>
 										</div>
 									</div>
@@ -457,7 +457,7 @@ function Home16Page() {
 								</div>
 
 								<div className="col-xl-6 col-lg-6 col-md-12 wt-separator-two-part-right text-right">
-									<NavLink to={"#!"} className=" site-button">
+									<NavLink to="/job-grid" className=" site-button">
 										Browse All Jobs
 									</NavLink>
 								</div>
@@ -467,368 +467,68 @@ function Home16Page() {
 						<div className="section-content">
 							<div className="twm-jobs-grid-wrap">
 								<div className="row">
-									<div className="col-lg-4 col-md-6">
-										<div className="twm-jobs-grid-style1  m-b30">
-											<div className="twm-media">
-												<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
-											</div>
-
-											{/* <span className="twm-job-post-duration">1 days ago</span> */}
-											<div className="twm-jobs-category green">
-												<span className="twm-bg-green">New</span>
-											</div>
-											<div className="twm-mid-content">
-												<NavLink to={"#!"} className="twm-job-title">
-													<h4>Senior Web Designer , Developer</h4>
-												</NavLink>
-												{/* <p className="twm-job-address">
-													Join our innovative startup as a senior web designer
-													working on cutting-edge projects...
-												</p> */}
-												<div className="twm-job-address">
-													<i className="feather-map-pin" />
-													&nbsp; Hyderabad
+									{jobs.length > 0 ? jobs.slice(0, 6).map((job) => (
+										<div key={job._id} className="col-lg-4 col-md-6">
+											<div className="twm-jobs-grid-style1  m-b30">
+												<div className="twm-media">
+													{job.employerProfile?.logo ? (
+														<img src={`http://localhost:5000/${job.employerProfile.logo}`} alt="Company Logo" />
+													) : (
+														<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
+													)}
 												</div>
-											</div>
 
-											<div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply mb-2">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
+												<div className="twm-jobs-category green">
+													<span className={`twm-bg-${job.status === 'active' ? 'green' : 'gray'}`}>
+														{job.status === 'active' ? 'Active' : job.status}
+													</span>
+												</div>
+												<div className="twm-mid-content">
+													<NavLink to={`/job-detail/${job._id}`} className="twm-job-title">
+														<h4>{job.title}</h4>
+													</NavLink>
+													<div className="twm-job-address">
+														<i className="feather-map-pin" />
+														&nbsp; {job.location}
+													</div>
+												</div>
+
+												<div className="twm-right-content twm-job-right-group">
+													<div className="twm-salary-and-apply mb-2">
+														<div className="twm-jobs-amount">
+															{job.salary || 'Salary not specified'}
+														</div>
+														<span className="vacancy-text">Vacancies: {job.vacancies || 'Not specified'}</span>
 													</div>
 
-													{/* Vacancies as plain text */}
-													<span className="vacancy-text">Vacancies: 4</span>
-												</div>
+													<div className="d-flex align-items-center justify-content-between">
+														<h6 className="twm-job-address posted-by-company mb-0">
+															{job.employerId?.companyName || 'Company'}
+														</h6>
 
-												{/* Posted by + Apply Now on same line */}
-												<div className="d-flex align-items-center justify-content-between">
-													<h6 className="twm-job-address posted-by-company mb-0">
-														Posted by Company
-													</h6>
-
-													<NavLink
-														to="#!"
-														className="btn btn-sm apply-now-button"
-													>
-														Apply Now
-													</NavLink>
+														<button
+															className="btn btn-sm apply-now-button"
+															onClick={() => {
+																const token = localStorage.getItem('candidateToken');
+																if (!token) {
+																	window.location.href = '/login';
+																} else {
+																	alert('Application submitted successfully!');
+																}
+															}}
+														>
+															Apply Now
+														</button>
+													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-
-									<div className="col-lg-4 col-md-6">
-										<div className="twm-jobs-grid-style1 m-b30">
-											<div className="twm-media">
-												<JobZImage src="images/jobs-company/pic2.jpg" alt="#" />
-											</div>
-
-											{/* <span className="twm-job-post-duration">15 days ago</span> */}
-
-											<div className="twm-jobs-category green">
-												<span className="twm-bg-brown">Intership</span>
-											</div>
-
-											<div className="twm-mid-content">
-												<NavLink to={"#!"} className="twm-job-title">
-													<h4>Senior Rolling Stock Technician</h4>
-												</NavLink>
-
-												{/* <p className="twm-job-address">
-													Join our innovative startup as a senior web designer
-													working on cutting-edge projects...
-												</p> */}
-
-												<div className="twm-job-address">
-													<i className="feather-map-pin" />
-													&nbsp; Bengaluru
-												</div>
-											</div>
-
-											{/* <div className="twm-right-content">
-												<div className="twm-jobs-amount">
-													₹ 4.25-5.5 Lacs <span>P.A</span>
-												</div>
-												<h6 className="twm-job-address">
-													Posted by Company
-												</h6>
-
-												<NavLink
-													to={"#!"}
-													className="twm-jobs-browse site-text-primary"
-												>
-													Apply Now
-												</NavLink>
-											</div> */}
-											<div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply mb-2">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
-													</div>
-
-													{/* Vacancies as plain text */}
-													<span className="vacancy-text">Vacancies: 4</span>
-												</div>
-
-												{/* Posted by + Apply Now on same line */}
-												<div className="d-flex align-items-center justify-content-between">
-													<h6 className="twm-job-address posted-by-company mb-0">
-														Posted by Company
-													</h6>
-
-													<NavLink
-														to="#!"
-														className="btn btn-sm apply-now-button"
-													>
-														Apply Now
-													</NavLink>
-												</div>
-											</div>
+									)) : (
+										<div className="col-12 text-center">
+											<p>No jobs available at the moment.</p>
 										</div>
-									</div>
+									)}
 
-									<div className="col-lg-4 col-md-6">
-										<div className="twm-jobs-grid-style1  m-b30">
-											<div className="twm-media">
-												<JobZImage src="images/jobs-company/pic3.jpg" alt="#" />
-											</div>
-
-											{/* <span className="twm-job-post-duration">6 Month ago</span> */}
-
-											<div className="twm-jobs-category green">
-												<span className="twm-bg-purple">Fulltime</span>
-											</div>
-
-											<div className="twm-mid-content">
-												<NavLink to={"#!"} className="twm-job-title">
-													<h4 className="twm-job-title">
-														IT Department Manager
-													</h4>
-												</NavLink>
-
-												{/* <p className="twm-job-address">
-													Join our innovative startup as a senior web designer
-													working on cutting-edge projects...
-												</p> */}
-
-												<div className="twm-job-address">
-													<i className="feather-map-pin" />
-													&nbsp;Sahakar Nagar, Bengaluru
-												</div>
-											</div>
-
-											<div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply mb-2">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
-													</div>
-
-													{/* Vacancies as plain text */}
-													<span className="vacancy-text">Vacancies: 4</span>
-												</div>
-
-												{/* Posted by + Apply Now on same line */}
-												<div className="d-flex align-items-center justify-content-between">
-													<h6 className="twm-job-address posted-by-company mb-0">
-														Posted by Company
-													</h6>
-
-													<NavLink
-														to="#!"
-														className="btn btn-sm apply-now-button"
-													>
-														Apply Now
-													</NavLink>
-												</div>
-											</div>
-
-											{/* <div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
-													</div>
-													<span>Vacancies:4</span>
-													<NavLink
-														to={"#!"}
-														className="twm-jobs-browse site-text-primary"
-													>
-														Apply Now
-													</NavLink>
-												</div>
-												<h6 className="twm-job-address posted-by-company">
-													Posted by Company
-												</h6>{" "}
-												
-											</div> */}
-										</div>
-									</div>
-
-									<div className="col-lg-4 col-md-6">
-										<div className="twm-jobs-grid-style1 m-b30">
-											<div className="twm-media">
-												<JobZImage src="images/jobs-company/pic4.jpg" alt="#" />
-											</div>
-
-											{/* <span className="twm-job-post-duration">2 days ago</span> */}
-
-											<div className="twm-jobs-category green">
-												<span className="twm-bg-sky">Freelancer</span>
-											</div>
-
-											<div className="twm-mid-content">
-												<NavLink to={"#!"} className="twm-job-title">
-													<h4 className="twm-job-title">Front end developer</h4>
-												</NavLink>
-
-												{/* <p className="twm-job-address">
-													Join our innovative startup as a senior web designer
-													working on cutting-edge projects...
-												</p> */}
-
-												<div className="twm-job-address">
-													<i className="feather-map-pin" />
-													&nbsp; Bengaluru
-												</div>
-											</div>
-
-											<div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply mb-2">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
-													</div>
-
-													{/* Vacancies as plain text */}
-													<span className="vacancy-text">Vacancies: 4</span>
-												</div>
-
-												{/* Posted by + Apply Now on same line */}
-												<div className="d-flex align-items-center justify-content-between">
-													<h6 className="twm-job-address posted-by-company mb-0">
-														Posted by Company
-													</h6>
-
-													<NavLink
-														to="#!"
-														className="btn btn-sm apply-now-button"
-													>
-														Apply Now
-													</NavLink>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div className="col-lg-4 col-md-6">
-										<div className="twm-jobs-grid-style1  m-b30">
-											<div className="twm-media">
-												<JobZImage src="images/jobs-company/pic5.jpg" alt="#" />
-											</div>
-
-											{/* <span className="twm-job-post-duration">1 days ago</span> */}
-
-											<div className="twm-jobs-category green">
-												<span className="twm-bg-golden">Temporary</span>
-											</div>
-
-											<div className="twm-mid-content">
-												<NavLink to={"#!"} className="twm-job-title">
-													<h4 className="twm-job-title">
-														Recreation &amp; Fitness Worker
-													</h4>
-												</NavLink>
-
-												{/* <p className="twm-job-address">
-													Join our innovative startup as a senior web designer
-													working on cutting-edge projects...
-												</p> */}
-
-												<div className="twm-job-address">
-													<i className="feather-map-pin" />
-													&nbsp; Bengaluru
-												</div>
-											</div>
-
-											<div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply mb-2">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
-													</div>
-
-													{/* Vacancies as plain text */}
-													<span className="vacancy-text">Vacancies: 4</span>
-												</div>
-
-												{/* Posted by + Apply Now on same line */}
-												<div className="d-flex align-items-center justify-content-between">
-													<h6 className="twm-job-address posted-by-company mb-0">
-														Posted by Company
-													</h6>
-
-													<NavLink
-														to="#!"
-														className="btn btn-sm apply-now-button"
-													>
-														Apply Now
-													</NavLink>
-												</div>
-											</div>
-										</div>
-									</div>
-
-									<div className="col-lg-4 col-md-6">
-										<div className="twm-jobs-grid-style1 m-b30">
-											<div className="twm-media">
-												<JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
-											</div>
-
-											{/* <span className="twm-job-post-duration">1 days ago</span> */}
-											<div className="twm-jobs-category green">
-												<span className="twm-bg-green">New</span>
-											</div>
-
-											<div className="twm-mid-content">
-												<NavLink to={"#!"} className="twm-job-title">
-													<h4>Senior Web Designer , Developer</h4>
-												</NavLink>
-
-												{/* <p className="twm-job-address">
-													Join our innovative startup as a senior web designer
-													working on cutting-edge projects...
-												</p> */}
-
-												<div className="twm-job-address">
-													<i className="feather-map-pin" />
-													&nbsp; Bengaluru
-												</div>
-											</div>
-
-											<div className="twm-right-content twm-job-right-group">
-												<div className="twm-salary-and-apply mb-2">
-													<div className="twm-jobs-amount">
-														₹ 4.25-5.5 Lacs <span>P.A</span>
-													</div>
-
-													{/* Vacancies as plain text */}
-													<span className="vacancy-text">Vacancies: 4</span>
-												</div>
-
-												{/* Posted by + Apply Now on same line */}
-												<div className="d-flex align-items-center justify-content-between">
-													<h6 className="twm-job-address posted-by-company mb-0">
-														Posted by Company
-													</h6>
-
-													<NavLink
-														to="#!"
-														className="btn btn-sm apply-now-button"
-													>
-														Apply Now
-													</NavLink>
-												</div>
-											</div>
-										</div>
-									</div>
 								</div>
 							</div>
 						</div>

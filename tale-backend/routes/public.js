@@ -7,6 +7,7 @@ const handleValidationErrors = require('../middlewares/validation');
 // Job Routes
 router.get('/jobs', publicController.getJobs);
 router.get('/jobs/search', publicController.searchJobs);
+router.get('/jobs/:id', publicController.getJobById);
 
 // Blog Routes
 router.get('/blogs', publicController.getBlogs);
@@ -26,5 +27,9 @@ router.get('/faqs', publicController.getFAQs);
 
 // Public Stats
 router.get('/stats', publicController.getPublicStats);
+
+// Employer Profile
+router.get('/employers/:id', publicController.getEmployerProfile);
+router.get('/employers', publicController.getEmployers);
 
 module.exports = router;

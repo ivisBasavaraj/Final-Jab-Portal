@@ -46,6 +46,7 @@ app.use('/api/public', publicRoutes);
 app.use('/api/candidate', candidateRoutes);
 app.use('/api/employer', employerRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', require('./routes/notifications'));
 
 // Health Check Route
 app.get('/health', (req, res) => {

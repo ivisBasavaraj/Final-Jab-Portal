@@ -2,11 +2,23 @@
 import JobZImage from "../jobz-img";
 import { NavLink } from "react-router-dom";
 import { publicUser } from "../../../globals/route-names";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import NotificationBell from "../../../components/NotificationBell";
 
 function Header1({ _config }) {
 
     const [menuActive, setMenuActive] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        const candidateToken = localStorage.getItem('candidateToken');
+        const employerToken = localStorage.getItem('employerToken');
+        const adminToken = localStorage.getItem('adminToken');
+        
+        if (candidateToken) setUserRole('candidate');
+        else if (employerToken) setUserRole('employer');
+        else if (adminToken) setUserRole('admin');
+    }, []);
 
     function handleNavigationClick () {
         setMenuActive(!menuActive);
@@ -79,6 +91,11 @@ function Header1({ _config }) {
                                 </div> */}
 
                                 <div className="extra-cell">
+                                    {userRole && (
+                                        <div style={{ marginRight: '15px' }}>
+                                            <NotificationBell userRole={userRole} />
+                                        </div>
+                                    )}
                                     <div className="header-nav-btn-section">
                                         <div className="twm-nav-btn-left">
                                             <a className="twm-nav-sign-up" data-bs-toggle="modal" href="#sign_up_popup" role="button">

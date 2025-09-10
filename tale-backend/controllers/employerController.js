@@ -95,6 +95,17 @@ exports.updateProfile = async (req, res) => {
       { new: true, upsert: true }
     ).populate('employerId', 'name email phone companyName');
 
+    // Create notification for admin when profile is updated
+    const { createNotification } = require('./notificationController');
+    await createNotification({
+      title: 'Company Profile Updated',
+      message: `${profile.companyName || 'A company'} has updated their profile`,
+      type: 'profile_submitted',
+      role: 'admin',
+      relatedId: profile._id,
+      createdBy: req.user._id
+    });
+
     res.json({ success: true, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -142,6 +153,17 @@ exports.createJob = async (req, res) => {
   try {
     const jobData = { ...req.body, employerId: req.user._id };
     const job = await Job.create(jobData);
+
+    // Create notification for all candidates when job is posted
+    const { createNotification } = require('./notificationController');
+    await createNotification({
+      title: 'New Job Posted',
+      message: `New ${job.title} position available at ${req.user.companyName}`,
+      type: 'job_posted',
+      role: 'candidate',
+      relatedId: job._id,
+      createdBy: req.user._id
+    });
 
     res.status(201).json({ success: true, job });
   } catch (error) {

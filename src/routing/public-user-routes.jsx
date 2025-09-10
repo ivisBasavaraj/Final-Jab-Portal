@@ -48,11 +48,13 @@ function PublicUserRoutes() {
             <Route path={publicUser.jobs.GRID_MAP} element={<JobsGridMapPage />} />
             <Route path={publicUser.jobs.LIST} element={<JobsListPage />} />
             <Route path={publicUser.jobs.DETAIL1} element={<JobDetail1Page />} />
+            <Route path="/job-detail/:id" element={<JobDetail1Page />} />
             <Route path={publicUser.jobs.DETAIL2} element={<JobDetail2Page />} />
             <Route path={publicUser.jobs.APPLY} element={<ApplyJobPage />} />
             <Route path={publicUser.employer.GRID} element={<EmployersGridPage />} />
             <Route path={publicUser.employer.LIST} element={<EmployersListPage />} />
             <Route path={publicUser.employer.DETAIL1} element={<EmployersDetail1Page />} />
+            <Route path="/emp-detail/:id" element={<EmployersDetail1Page />} />
             <Route path={publicUser.employer.DETAIL2} element={<EmployersDetail2Page />} />
             <Route path={publicUser.pages.ABOUT} element={<AboutUsPage />} />
             <Route path={publicUser.pages.PRICING} element={<PricingPage />} />

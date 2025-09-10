@@ -12,6 +12,7 @@ import AdminEmployersAllRequest from "../app/pannels/admin/components/admin-emp-
 import AdminEmployersApproved from "../app/pannels/admin/components/admin-emp-approve";
 import AdminEmployersRejected from "../app/pannels/admin/components/admin-emp-reject";
 import EmployerDetails from "../app/pannels/admin/components/adminEmployerDetails";
+import ShortlistedCandidatesPage from "../app/pannels/admin/components/shortlisted-candidates";
 
 function AdminRoutes() {
     return (
@@ -33,6 +34,7 @@ function AdminRoutes() {
 					path={admin.EMPLOYER_DETAILS}
 					element={<EmployerDetails />}
 				/>
+				<Route path="shortlisted" element={<ShortlistedCandidatesPage />} />
 			</Routes>
 		);
 }
