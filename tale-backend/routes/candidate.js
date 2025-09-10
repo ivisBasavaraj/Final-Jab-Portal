@@ -3,30 +3,7 @@ const { body } = require('express-validator');
 const router = express.Router();
 const candidateController = require('../controllers/candidateController');
 const auth = require('../middlewares/auth');
-const upload = require('../middlewares/upload');
-const multer = require('multer');
-const path = require('path');
-
-const marksheetStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/marksheets/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
-  }
-});
-
-const profilePictureStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/profile-pictures/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
-  }
-});
-
-const uploadMarksheet = multer({ storage: marksheetStorage });
-const uploadProfilePicture = multer({ storage: profilePictureStorage });
+const { upload } = require('../middlewares/upload');
 const handleValidationErrors = require('../middlewares/validation');
 
 // Authentication Routes
@@ -62,9 +39,9 @@ router.use(auth(['candidate']));
 
 // Profile Management Routes
 router.get('/profile', candidateController.getProfile);
-router.put('/profile', uploadProfilePicture.single('profilePicture'), candidateController.updateProfile);
+router.put('/profile', upload.single('profilePicture'), candidateController.updateProfile);
 router.post('/upload-resume', upload.single('resume'), candidateController.uploadResume);
-router.post('/upload-marksheet', uploadMarksheet.single('marksheet'), candidateController.uploadMarksheet);
+router.post('/upload-marksheet', upload.single('marksheet'), candidateController.uploadMarksheet);
 
 // Job Application Routes
 router.post('/jobs/:jobId/apply', [

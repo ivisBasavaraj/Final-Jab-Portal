@@ -76,11 +76,12 @@ function Home16Page() {
 													title=""
 													id="j-Job_Title"
 													data-bv-field="size"
+													defaultValue="Job Title"
 												>
 													<option disabled value="">
 														Select Category
 													</option>
-													<option selected>Job Title</option>
+													<option>Job Title</option>
 													<option>Web Designer</option>
 													<option>Developer</option>
 													<option>Acountant</option>
@@ -96,11 +97,12 @@ function Home16Page() {
 													title=""
 													id="j-All_Category"
 													data-bv-field="size"
+													defaultValue="All Category"
 												>
 													<option disabled value="">
 														Select Category
 													</option>
-													<option selected>All Category</option>
+													<option>All Category</option>
 													<option>Full Time</option>
 													<option>Internship</option>
 													<option>Contract</option>

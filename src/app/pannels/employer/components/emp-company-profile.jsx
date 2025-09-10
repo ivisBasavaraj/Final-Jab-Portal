@@ -194,11 +194,11 @@ function EmpCompanyProfilePage() {
                                 {formData.logo && (
                                     <div className="mt-2">
                                         <img 
-                                            src={formData.logo.startsWith('http') ? formData.logo : `http://localhost:5000/${formData.logo}`} 
+                                            src={formData.logo} 
                                             alt="Logo" 
                                             style={{maxWidth: '150px', maxHeight: '150px', objectFit: 'contain', border: '1px solid #ddd'}} 
                                             onError={(e) => {
-                                                console.log('Logo load error:', e.target.src); 
+                                                console.log('Logo load error'); 
                                                 e.target.src = '/images/default-logo.png';
                                             }}
                                         />
@@ -223,11 +223,11 @@ function EmpCompanyProfilePage() {
                                 {formData.coverImage && (
                                     <div className="mt-2">
                                         <img 
-                                            src={formData.coverImage.startsWith('http') ? formData.coverImage : `http://localhost:5000/${formData.coverImage}`} 
+                                            src={formData.coverImage} 
                                             alt="Cover" 
                                             style={{maxWidth: '300px', maxHeight: '150px', objectFit: 'cover', border: '1px solid #ddd'}} 
                                             onError={(e) => {
-                                                console.log('Cover load error:', e.target.src); 
+                                                console.log('Cover load error'); 
                                                 e.target.src = '/images/default-cover.png';
                                             }}
                                         />

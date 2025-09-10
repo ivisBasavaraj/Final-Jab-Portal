@@ -24,11 +24,18 @@ const employerProfileSchema = new mongoose.Schema({
   gstNumber: { type: String },
   industrySector: { type: String },
   panNumber: { type: String },
-  panCardImage: { type: String },
-  cinImage: { type: String },
-  gstImage: { type: String },
-  certificateOfIncorporation: { type: String },
-  authorizationLetter: { type: String },
+  panCardImage: { type: String }, // Base64 encoded image
+  cinImage: { type: String }, // Base64 encoded image
+  gstImage: { type: String }, // Base64 encoded image
+  certificateOfIncorporation: { type: String }, // Base64 encoded document
+  authorizationLetter: { type: String }, // Base64 encoded document
+  
+  // Document verification status
+  panCardVerified: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  cinVerified: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  gstVerified: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  incorporationVerified: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  authorizationVerified: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   agreeTerms: { type: String },
   
   // Primary Contact
@@ -40,8 +47,8 @@ const employerProfileSchema = new mongoose.Schema({
   
   // Legacy fields
   companyDescription: { type: String },
-  logo: { type: String },
-  coverImage: { type: String },
+  logo: { type: String }, // Base64 encoded image
+  coverImage: { type: String }, // Base64 encoded image
   industry: { type: String },
   companySize: { type: String, enum: ['1-10', '11-50', '51-200', '201-500', '500+'] },
   location: { type: String },

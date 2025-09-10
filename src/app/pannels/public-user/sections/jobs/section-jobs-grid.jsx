@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 function SectionJobsGrid({ filters }) {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchJobs();
@@ -37,6 +39,19 @@ function SectionJobsGrid({ filters }) {
         }
     };
 
+    const handleApplyClick = (jobId) => {
+        const candidateToken = localStorage.getItem('candidateToken');
+        if (candidateToken) {
+            navigate(`/job-detail/${jobId}`);
+        } else {
+            setShowLoginModal(true);
+        }
+    };
+
+    const handleLogin = () => {
+        navigate('/candidate-login');
+    };
+
     if (loading) {
         return <div className="text-center p-5">Loading jobs...</div>;
     }
@@ -49,7 +64,7 @@ function SectionJobsGrid({ filters }) {
                         <div className="twm-jobs-grid-style1">
                             <div className="twm-media">
                                 {job.employerProfile?.logo ? (
-                                    <img src={`http://localhost:5000/${job.employerProfile.logo}`} alt="Company Logo" />
+                                    <img src={job.employerProfile.logo} alt="Company Logo" />
                                 ) : (
                                     <JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
                                 )}
@@ -87,12 +102,12 @@ function SectionJobsGrid({ filters }) {
                                         Posted: {new Date(job.createdAt).toLocaleDateString()}
                                     </h6>
 
-                                    <NavLink
-                                        to={`/job-detail/${job._id}`}
+                                    <button
+                                        onClick={() => handleApplyClick(job._id)}
                                         className="btn btn-sm apply-now-button"
                                     >
                                         Apply Now
-                                    </NavLink>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -105,6 +120,45 @@ function SectionJobsGrid({ filters }) {
                 )}
             </div>
             <SectionPagination />
+            
+            {/* Login Modal */}
+            {showLoginModal && (
+                <div className="modal fade show" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Login Required</h5>
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={() => setShowLoginModal(false)}
+                                ></button>
+                            </div>
+                            <div className="modal-body text-center p-4">
+                                <div className="mb-3">
+                                    <i className="fa fa-lock" style={{fontSize: '48px', color: '#2a6310'}}></i>
+                                </div>
+                                <h4 className="mb-3">Please Login for Applying Job</h4>
+                                <p className="text-muted mb-4">You need to be logged in as a candidate to apply for jobs.</p>
+                                <div className="d-flex gap-2 justify-content-center">
+                                    <button 
+                                        className="btn btn-primary px-4"
+                                        onClick={handleLogin}
+                                    >
+                                        Login
+                                    </button>
+                                    <button 
+                                        className="btn btn-secondary px-4"
+                                        onClick={() => setShowLoginModal(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

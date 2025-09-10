@@ -80,7 +80,7 @@ function EmployersGridPage() {
                                             <div className="twm-employer-grid-style1 mb-5">
                                                 <div className="twm-media">
                                                     {employer.profile?.logo ? (
-                                                        <img src={`http://localhost:5000/${employer.profile.logo}`} alt="Company Logo" />
+                                                        <img src={employer.profile.logo} alt="Company Logo" />
                                                     ) : (
                                                         <JobZImage src="images/jobs-company/pic1.jpg" alt="#" />
                                                     )}

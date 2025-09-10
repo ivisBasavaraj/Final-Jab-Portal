@@ -34,7 +34,7 @@ function AdminEmployersAllRequest() {
             const response = await api.updateEmployerStatus(employerId, 'approved');
             if (response.success) {
                 setEmployers(employers.map(emp => 
-                    emp._id === employerId ? { ...emp, status: 'approved' } : emp
+                    emp._id === employerId ? { ...emp, status: 'approved', isApproved: true } : emp
                 ));
                 alert('Employer approved successfully');
             } else {
@@ -51,7 +51,7 @@ function AdminEmployersAllRequest() {
             const response = await api.updateEmployerStatus(employerId, 'rejected');
             if (response.success) {
                 setEmployers(employers.map(emp => 
-                    emp._id === employerId ? { ...emp, status: 'rejected' } : emp
+                    emp._id === employerId ? { ...emp, status: 'rejected', isApproved: false } : emp
                 ));
                 alert('Employer rejected successfully');
             } else {

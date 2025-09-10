@@ -44,17 +44,27 @@ exports.registerEmployer = async (req, res) => {
 exports.loginEmployer = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Employer login attempt:', { email });
 
     const employer = await Employer.findOne({ email });
-    if (!employer || !(await employer.comparePassword(password))) {
+    if (!employer) {
+      console.log('Employer not found:', email);
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    const isPasswordValid = await employer.comparePassword(password);
+    if (!isPasswordValid) {
+      console.log('Invalid password for employer:', email);
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     if (employer.status !== 'active') {
+      console.log('Inactive employer account:', email, 'Status:', employer.status);
       return res.status(401).json({ success: false, message: 'Account is inactive' });
     }
 
     const token = generateToken(employer._id, 'employer');
+    console.log('Employer login successful:', email);
 
     res.json({
       success: true,
@@ -67,6 +77,7 @@ exports.loginEmployer = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Employer login error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -75,7 +86,7 @@ exports.loginEmployer = async (req, res) => {
 exports.getProfile = async (req, res) => {
   try {
     const profile = await EmployerProfile.findOne({ employerId: req.user._id })
-      .populate('employerId', 'name email phone companyName');
+      .populate('employerId', 'name email phone companyName isApproved');
     
     if (!profile) {
       return res.json({ success: true, profile: null });
@@ -122,13 +133,16 @@ exports.uploadLogo = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    const { fileToBase64 } = require('../middlewares/upload');
+    const logoBase64 = fileToBase64(req.file);
+
     const profile = await EmployerProfile.findOneAndUpdate(
       { employerId: req.user._id },
-      { logo: req.file.path },
+      { logo: logoBase64 },
       { new: true, upsert: true }
     );
 
-    res.json({ success: true, logo: req.file.path, profile });
+    res.json({ success: true, logo: logoBase64, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -140,13 +154,16 @@ exports.uploadCover = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    const { fileToBase64 } = require('../middlewares/upload');
+    const coverBase64 = fileToBase64(req.file);
+
     const profile = await EmployerProfile.findOneAndUpdate(
       { employerId: req.user._id },
-      { coverImage: req.file.path },
+      { coverImage: coverBase64 },
       { new: true, upsert: true }
     );
 
-    res.json({ success: true, coverImage: req.file.path, profile });
+    res.json({ success: true, coverImage: coverBase64, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -158,8 +175,10 @@ exports.uploadDocument = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    const { fileToBase64 } = require('../middlewares/upload');
     const { fieldName } = req.body;
-    const updateData = { [fieldName]: req.file.path };
+    const documentBase64 = fileToBase64(req.file);
+    const updateData = { [fieldName]: documentBase64 };
 
     const profile = await EmployerProfile.findOneAndUpdate(
       { employerId: req.user._id },
@@ -167,7 +186,7 @@ exports.uploadDocument = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    res.json({ success: true, filePath: req.file.path, profile });
+    res.json({ success: true, filePath: documentBase64, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -176,6 +195,14 @@ exports.uploadDocument = async (req, res) => {
 // Job Management Controllers
 exports.createJob = async (req, res) => {
   try {
+    // Check if employer is approved
+    if (!req.user.isApproved) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Your account needs admin approval before you can post jobs. Please wait for approval.' 
+      });
+    }
+
     const jobData = { ...req.body, employerId: req.user._id };
     const job = await Job.create(jobData);
 

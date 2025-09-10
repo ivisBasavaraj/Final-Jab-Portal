@@ -7,8 +7,8 @@ const candidateProfileSchema = new mongoose.Schema({
   dateOfBirth: { type: Date },
   location: { type: String },
   bio: { type: String },
-  resume: { type: String },
-  profilePicture: { type: String },
+  resume: { type: String }, // Base64 encoded document
+  profilePicture: { type: String }, // Base64 encoded image
   resumeHeadline: { type: String },
   profileSummary: { type: String },
   gender: { type: String },
@@ -22,7 +22,7 @@ const candidateProfileSchema = new mongoose.Schema({
     collegeName: String,
     passYear: String,
     percentage: String,
-    marksheet: String
+    marksheet: String // Base64 encoded document
   }],
   experience: [{
     company: String,

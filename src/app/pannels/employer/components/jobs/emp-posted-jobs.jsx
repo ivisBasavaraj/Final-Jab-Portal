@@ -8,6 +8,7 @@ export default function EmpPostedJobs() {
 	const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isApproved, setIsApproved] = useState(false);
     
     useEffect(() => {
         loadScript("js/custom.js");
@@ -18,6 +19,17 @@ export default function EmpPostedJobs() {
         try {
             const token = localStorage.getItem('employerToken');
             if (!token) return;
+
+            // Fetch employer profile to check approval status
+            const profileResponse = await fetch('http://localhost:5000/api/employer/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (profileResponse.ok) {
+                const profileData = await profileResponse.json();
+                const employerData = profileData.profile?.employerId;
+                setIsApproved(employerData?.isApproved || false);
+            }
 
             const response = await fetch('http://localhost:5000/api/employer/jobs', {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -111,11 +123,20 @@ export default function EmpPostedJobs() {
                     </div>
 					
                     <div className="text-left">
-                        <NavLink to={empRoute(employer.POST_A_JOB)}>
-                            <button type="submit" className="site-button">
-                                Post Job
-                            </button>
-                        </NavLink>
+                        {isApproved ? (
+                            <NavLink to={empRoute(employer.POST_A_JOB)}>
+                                <button type="submit" className="site-button">
+                                    Post Job
+                                </button>
+                            </NavLink>
+                        ) : (
+                            <div>
+                                <button type="button" className="site-button" disabled>
+                                    Post Job
+                                </button>
+                                <p className="text-warning mt-2 mb-0">Account pending admin approval</p>
+                            </div>
+                        )}
                     </div>
 				</div>
 
@@ -162,9 +183,16 @@ export default function EmpPostedJobs() {
 							{jobs.length === 0 ? (
 								<div className="col-12 text-center py-4">
 									<p className="text-muted">No jobs posted yet.</p>
-									<NavLink to={empRoute(employer.POST_A_JOB)}>
-										<button className="site-button">Post Your First Job</button>
-									</NavLink>
+									{isApproved ? (
+										<NavLink to={empRoute(employer.POST_A_JOB)}>
+											<button className="site-button">Post Your First Job</button>
+										</NavLink>
+									) : (
+										<div>
+											<button className="site-button" disabled>Post Your First Job</button>
+											<p className="text-warning mt-2">Your account is pending admin approval before you can post jobs.</p>
+										</div>
+									)}
 								</div>
 							) : (
 								jobs.map((job) => (

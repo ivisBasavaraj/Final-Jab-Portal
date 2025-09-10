@@ -13,8 +13,15 @@ const NotificationBell = ({ userRole }) => {
 
   const fetchNotifications = async () => {
     try {
+      const token = localStorage.getItem(`${userRole}Token`);
+      if (!token) return;
+      
       console.log('Fetching notifications for role:', userRole);
-      const response = await fetch(`http://localhost:5000/api/notifications/${userRole}`);
+      const response = await fetch(`http://localhost:5000/api/notifications/${userRole}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       console.log('Notifications response:', data);
       if (data.success) {
@@ -30,8 +37,14 @@ const NotificationBell = ({ userRole }) => {
 
   const markAsRead = async (notificationId) => {
     try {
+      const token = localStorage.getItem(`${userRole}Token`);
+      if (!token) return;
+      
       await fetch(`http://localhost:5000/api/notifications/${notificationId}/read`, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       fetchNotifications();
     } catch (error) {
@@ -41,8 +54,14 @@ const NotificationBell = ({ userRole }) => {
 
   const markAllAsRead = async () => {
     try {
+      const token = localStorage.getItem(`${userRole}Token`);
+      if (!token) return;
+      
       await fetch(`http://localhost:5000/api/notifications/${userRole}/read-all`, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       fetchNotifications();
     } catch (error) {

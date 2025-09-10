@@ -10,6 +10,8 @@ const Testimonial = require('../models/Testimonial');
 const FAQ = require('../models/FAQ');
 const Partner = require('../models/Partner');
 const SiteSettings = require('../models/SiteSettings');
+const EmployerProfile = require('../models/EmployerProfile');
+const { base64ToBuffer, generateFilename } = require('../utils/base64Helper');
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
@@ -213,10 +215,14 @@ exports.getAllCandidates = async (req, res) => {
 
 exports.updateEmployerStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, isApproved } = req.body;
+    const updateData = {};
+    if (status !== undefined) updateData.status = status;
+    if (isApproved !== undefined) updateData.isApproved = isApproved;
+    
     const employer = await Employer.findByIdAndUpdate(
       req.params.id,
-      { status },
+      updateData,
       { new: true }
     ).select('-password');
 
@@ -274,7 +280,6 @@ exports.deleteEmployer = async (req, res) => {
 
 exports.getEmployerProfile = async (req, res) => {
   try {
-    const EmployerProfile = require('../models/EmployerProfile');
     const profile = await EmployerProfile.findOne({ employerId: req.params.id })
       .populate('employerId', 'name email phone companyName');
     
@@ -283,6 +288,50 @@ exports.getEmployerProfile = async (req, res) => {
     }
 
     res.json({ success: true, profile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateEmployerProfile = async (req, res) => {
+  try {
+    const profile = await EmployerProfile.findOneAndUpdate(
+      { employerId: req.params.id },
+      req.body,
+      { new: true }
+    ).populate('employerId', 'name email phone companyName');
+    
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Employer profile not found' });
+    }
+
+    res.json({ success: true, profile });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Download Base64 document
+exports.downloadDocument = async (req, res) => {
+  try {
+    const { employerId, documentType } = req.params;
+    
+    const profile = await EmployerProfile.findOne({ employerId });
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Profile not found' });
+    }
+
+    const base64Data = profile[documentType];
+    if (!base64Data) {
+      return res.status(404).json({ success: false, message: 'Document not found' });
+    }
+
+    const { buffer, mimeType, extension } = base64ToBuffer(base64Data);
+    const filename = generateFilename(documentType, extension);
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

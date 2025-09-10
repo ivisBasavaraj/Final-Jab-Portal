@@ -4,7 +4,7 @@ const router = express.Router();
 const employerController = require('../controllers/employerController');
 const employerPasswordController = require('../controllers/employerPasswordController');
 const auth = require('../middlewares/auth');
-const upload = require('../middlewares/upload');
+const { upload } = require('../middlewares/upload');
 const handleValidationErrors = require('../middlewares/validation');
 
 // Authentication Routes

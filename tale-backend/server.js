@@ -38,8 +38,7 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Static Files
-app.use('/uploads', express.static('uploads'));
+// Note: Static file serving removed - all files now stored as Base64 in database
 
 // API Routes
 app.use('/api/public', publicRoutes);

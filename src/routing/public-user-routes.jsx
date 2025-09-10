@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { publicUser } from "../globals/route-names";
 
 import Home16Page from "../app/pannels/public-user/components/home/index16";
+import HomeNaukriPreview from "../app/pannels/public-user/components/home/naukri-preview";
 
 import JobsGridPage from "../app/pannels/public-user/components/jobs/jobs-grid";
 import JobsGridMapPage from "../app/pannels/public-user/components/jobs/jobs-grid-map";
@@ -44,6 +45,9 @@ function PublicUserRoutes() {
     return (
         <Routes>
             <Route path={publicUser.INITIAL} element={<Home16Page />} />
+            {/* Preview route for Naukri-style homepage */}
+            <Route path="/naukri-home" element={<HomeNaukriPreview />} />
+
             <Route path={publicUser.jobs.GRID} element={<JobsGridPage />} />
             <Route path={publicUser.jobs.GRID_MAP} element={<JobsGridMapPage />} />
             <Route path={publicUser.jobs.LIST} element={<JobsListPage />} />

@@ -19,7 +19,18 @@ function EmployerDetails() {
             });
             const data = await response.json();
             if (data.success) {
-                setProfile(data.profile);
+                console.log('Profile data:', data.profile);
+                // Set default verification status for existing profiles
+                const profileWithDefaults = {
+                    ...data.profile,
+                    panCardVerified: data.profile.panCardVerified || 'pending',
+                    cinVerified: data.profile.cinVerified || 'pending',
+                    gstVerified: data.profile.gstVerified || 'pending',
+                    incorporationVerified: data.profile.incorporationVerified || 'pending',
+                    authorizationVerified: data.profile.authorizationVerified || 'pending'
+                };
+                console.log('Profile with defaults:', profileWithDefaults);
+                setProfile(profileWithDefaults);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -30,6 +41,56 @@ function EmployerDetails() {
 
     const formatDate = (date) => {
         return date ? new Date(date).toLocaleDateString() : 'N/A';
+    };
+
+    const downloadDocument = async (employerId, documentType) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`http://localhost:5000/api/admin/download-document/${employerId}/${documentType}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${documentType}_${employerId}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } else {
+                alert('Failed to download document');
+            }
+        } catch (error) {
+            console.error('Download error:', error);
+            alert('Error downloading document');
+        }
+    };
+
+    const updateDocumentStatus = async (employerId, field, status) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`http://localhost:5000/api/admin/employer-profile/${employerId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ [field]: status })
+            });
+            
+            if (response.ok) {
+                setProfile(prev => ({ ...prev, [field]: status }));
+                alert(`Document ${status} successfully`);
+            } else {
+                alert('Failed to update document status');
+            }
+        } catch (error) {
+            console.error('Update error:', error);
+            alert('Error updating document status');
+        }
     };
 
     if (loading) return <div className="p-3">Loading...</div>;
@@ -87,63 +148,99 @@ function EmployerDetails() {
                             <thead>
                                 <tr>
                                     <th>Document Type</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Upload Status</th>
+                                    <th>Verification Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>PAN Card Image</td>
-                                    <td>{profile.panCardImage ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>{profile.panCardImage ? <span className="badge bg-success">Uploaded</span> : <span className="badge bg-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        <span className={`badge ${profile.panCardVerified === 'approved' ? 'bg-success' : profile.panCardVerified === 'rejected' ? 'bg-danger' : 'bg-secondary'}`}>
+                                            {profile.panCardVerified === 'approved' ? 'Approved' : profile.panCardVerified === 'rejected' ? 'Rejected' : 'Pending'}
+                                        </span>
+                                    </td>
                                     <td>
                                         {profile.panCardImage && (
-                                            <a href={`http://localhost:5000/${profile.panCardImage}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
-                                                Download
-                                            </a>
+                                            <>
+                                                <button className="btn btn-sm btn-primary me-1" onClick={() => downloadDocument(id, 'panCardImage')}>Download</button>
+                                                <button className="btn btn-sm btn-success me-1" onClick={() => updateDocumentStatus(id, 'panCardVerified', 'approved')}>Approve</button>
+                                                <button className="btn btn-sm btn-danger" onClick={() => updateDocumentStatus(id, 'panCardVerified', 'rejected')}>Reject</button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>CIN Document</td>
-                                    <td>{profile.cinImage ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>{profile.cinImage ? <span className="badge bg-success">Uploaded</span> : <span className="badge bg-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        <span className={`badge ${profile.cinVerified === 'approved' ? 'bg-success' : profile.cinVerified === 'rejected' ? 'bg-danger' : 'bg-secondary'}`}>
+                                            {profile.cinVerified === 'approved' ? 'Approved' : profile.cinVerified === 'rejected' ? 'Rejected' : 'Pending'}
+                                        </span>
+                                    </td>
                                     <td>
                                         {profile.cinImage && (
-                                            <a href={`http://localhost:5000/${profile.cinImage}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
-                                                Download
-                                            </a>
+                                            <>
+                                                <button className="btn btn-sm btn-primary me-1" onClick={() => downloadDocument(id, 'cinImage')}>Download</button>
+                                                <button className="btn btn-sm btn-success me-1" onClick={() => updateDocumentStatus(id, 'cinVerified', 'approved')}>Approve</button>
+                                                <button className="btn btn-sm btn-danger" onClick={() => updateDocumentStatus(id, 'cinVerified', 'rejected')}>Reject</button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>GST Certificate</td>
-                                    <td>{profile.gstImage ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>{profile.gstImage ? <span className="badge bg-success">Uploaded</span> : <span className="badge bg-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        <span className={`badge ${profile.gstVerified === 'approved' ? 'bg-success' : profile.gstVerified === 'rejected' ? 'bg-danger' : 'bg-secondary'}`}>
+                                            {profile.gstVerified === 'approved' ? 'Approved' : profile.gstVerified === 'rejected' ? 'Rejected' : 'Pending'}
+                                        </span>
+                                    </td>
                                     <td>
                                         {profile.gstImage && (
-                                            <a href={`http://localhost:5000/${profile.gstImage}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
-                                                Download
-                                            </a>
+                                            <>
+                                                <button className="btn btn-sm btn-primary me-1" onClick={() => downloadDocument(id, 'gstImage')}>Download</button>
+                                                <button className="btn btn-sm btn-success me-1" onClick={() => updateDocumentStatus(id, 'gstVerified', 'approved')}>Approve</button>
+                                                <button className="btn btn-sm btn-danger" onClick={() => updateDocumentStatus(id, 'gstVerified', 'rejected')}>Reject</button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Certificate of Incorporation</td>
-                                    <td>{profile.certificateOfIncorporation ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>{profile.certificateOfIncorporation ? <span className="badge bg-success">Uploaded</span> : <span className="badge bg-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        <span className={`badge ${profile.incorporationVerified === 'approved' ? 'bg-success' : profile.incorporationVerified === 'rejected' ? 'bg-danger' : 'bg-secondary'}`}>
+                                            {profile.incorporationVerified === 'approved' ? 'Approved' : profile.incorporationVerified === 'rejected' ? 'Rejected' : 'Pending'}
+                                        </span>
+                                    </td>
                                     <td>
                                         {profile.certificateOfIncorporation && (
-                                            <a href={`http://localhost:5000/${profile.certificateOfIncorporation}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
-                                                Download
-                                            </a>
+                                            <>
+                                                <button className="btn btn-sm btn-primary me-1" onClick={() => downloadDocument(id, 'certificateOfIncorporation')}>Download</button>
+                                                <button className="btn btn-sm btn-success me-1" onClick={() => updateDocumentStatus(id, 'incorporationVerified', 'approved')}>Approve</button>
+                                                <button className="btn btn-sm btn-danger" onClick={() => updateDocumentStatus(id, 'incorporationVerified', 'rejected')}>Reject</button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Authorization Letter</td>
-                                    <td>{profile.authorizationLetter ? <span className="badge badge-success">Uploaded</span> : <span className="badge badge-warning">Not Uploaded</span>}</td>
+                                    <td>{profile.authorizationLetter ? <span className="badge bg-success">Uploaded</span> : <span className="badge bg-warning">Not Uploaded</span>}</td>
+                                    <td>
+                                        <span className={`badge ${profile.authorizationVerified === 'approved' ? 'bg-success' : profile.authorizationVerified === 'rejected' ? 'bg-danger' : 'bg-secondary'}`}>
+                                            {profile.authorizationVerified === 'approved' ? 'Approved' : profile.authorizationVerified === 'rejected' ? 'Rejected' : 'Pending'}
+                                        </span>
+                                    </td>
                                     <td>
                                         {profile.authorizationLetter && (
-                                            <a href={`http://localhost:5000/${profile.authorizationLetter}`} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary">
-                                                Download
-                                            </a>
+                                            <>
+                                                <button className="btn btn-sm btn-primary me-1" onClick={() => downloadDocument(id, 'authorizationLetter')}>Download</button>
+                                                <button className="btn btn-sm btn-success me-1" onClick={() => updateDocumentStatus(id, 'authorizationVerified', 'approved')}>Approve</button>
+                                                <button className="btn btn-sm btn-danger" onClick={() => updateDocumentStatus(id, 'authorizationVerified', 'rejected')}>Reject</button>
+                                            </>
                                         )}
                                     </td>
                                 </tr>

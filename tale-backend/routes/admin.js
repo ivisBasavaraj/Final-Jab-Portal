@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const auth = require('../middlewares/auth');
-const upload = require('../middlewares/upload');
+const { upload } = require('../middlewares/upload');
 const handleValidationErrors = require('../middlewares/validation');
 
 // Authentication Route
@@ -32,6 +32,8 @@ router.put('/jobs/:jobId/reject', adminController.rejectJob);
 // Employer Management Routes
 router.get('/employers', adminController.getAllEmployers);
 router.get('/employer-profile/:id', adminController.getEmployerProfile);
+router.put('/employer-profile/:id', adminController.updateEmployerProfile);
+router.get('/download-document/:employerId/:documentType', adminController.downloadDocument);
 router.put('/employers/:id/status', adminController.updateEmployerStatus);
 router.delete('/employers/:id', adminController.deleteEmployer);
 

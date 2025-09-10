@@ -9,6 +9,7 @@ const employerSchema = new mongoose.Schema({
   companyName: { type: String, required: true },
   isVerified: { type: Boolean, default: false },
   status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  isApproved: { type: Boolean, default: false },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date }
 }, {

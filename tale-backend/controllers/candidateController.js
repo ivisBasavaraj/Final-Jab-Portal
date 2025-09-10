@@ -104,7 +104,8 @@ exports.updateProfile = async (req, res) => {
     // Prepare profile update data
     const updateData = { ...profileData };
     if (req.file) {
-      updateData.profilePicture = req.file.path;
+      const { fileToBase64 } = require('../middlewares/upload');
+      updateData.profilePicture = fileToBase64(req.file);
     }
     
     // Update profile data
@@ -128,13 +129,16 @@ exports.uploadResume = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    const { fileToBase64 } = require('../middlewares/upload');
+    const resumeBase64 = fileToBase64(req.file);
+
     const profile = await CandidateProfile.findOneAndUpdate(
       { candidateId: req.user._id },
-      { resume: req.file.path },
+      { resume: resumeBase64 },
       { new: true, upsert: true }
     );
 
-    res.json({ success: true, resume: req.file.path, profile });
+    res.json({ success: true, resume: resumeBase64, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -146,7 +150,10 @@ exports.uploadMarksheet = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
-    res.json({ success: true, filePath: req.file.path });
+    const { fileToBase64 } = require('../middlewares/upload');
+    const marksheetBase64 = fileToBase64(req.file);
+
+    res.json({ success: true, filePath: marksheetBase64 });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

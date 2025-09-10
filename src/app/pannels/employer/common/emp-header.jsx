@@ -1,6 +1,7 @@
 import JobZImage from "../../../common/jobz-img";
 import { NavLink } from "react-router-dom";
 import { empRoute, employer } from "../../../../globals/route-names";
+import NotificationBell from "../../../../components/NotificationBell";
 
 function EmpHeaderSection(props) {
     return (
@@ -26,53 +27,7 @@ function EmpHeaderSection(props) {
                                 
                                 {/*Notification*/}
                                 <li className="header-widget dashboard-noti-dropdown">
-                                    <div className="dropdown">
-                                        <a href="#" className="dropdown-toggle jobzilla-admin-notification" id="ID-NOTI_dropdown" data-bs-toggle="dropdown">
-                                            <i className="far fa-bell" />
-                                            <span className="notification-animate">8</span>
-                                        </a>
-                                        <div className="dropdown-menu" aria-labelledby="ID-NOTI_dropdown">
-                                            <div className="dashboard-widgets-header">You have 7 notifications</div>
-                                            <div className="noti-list dashboard-widget-scroll">
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">
-                                                            <span className="noti-icon"><i className="far fa-bell" /></span>
-                                                            <span className="noti-texting">Devid applied for <b>Webdesigner.</b> </span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <span className="noti-icon"><i className="far fa-bell" /></span>
-                                                            <span className="noti-texting">Nikol sent you a message. </span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <span className="noti-icon"><i className="far fa-bell" /></span>
-                                                            <span className="noti-texting">lucy bookmarked your <b>SEO Expert</b> Job! </span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <span className="noti-icon"><i className="far fa-bell" /></span>
-                                                            <span className="noti-texting">Your job for <b>teacher</b> has been approved! </span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#">
-                                                            <span className="noti-icon"><i className="far fa-bell" /></span>
-                                                            <span className="noti-texting">Thor applied for <b>Team Leader</b>. </span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-
-                                                <div className="noti-view-all">
-                                                    <a href="#">View All</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <NotificationBell userRole="employer" />
                                 </li>
 
                                 {/*Account*/}

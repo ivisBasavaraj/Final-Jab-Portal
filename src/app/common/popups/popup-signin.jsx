@@ -9,7 +9,8 @@ function SignInPopup() {
     const { login } = useAuth();
     const [canusername, setCanUsername] = useState('');
     const [empusername, setEmpUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [canpassword, setCanPassword] = useState('');
+    const [emppassword, setEmpPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -20,7 +21,7 @@ function SignInPopup() {
         
         const result = await login({
             email: canusername,
-            password: password
+            password: canpassword
         }, 'candidate');
         
         if (result.success) {
@@ -38,7 +39,7 @@ function SignInPopup() {
         
         const result = await login({
             email: empusername,
-            password: password
+            password: emppassword
         }, 'employer');
         
         if (result.success) {
@@ -110,19 +111,6 @@ function SignInPopup() {
 												Employer
 											</button>
 										</li>
-
-										{/*Login Placement Officer*/}
-										{/* <li className="nav-item">
-											<button
-												className="nav-link"
-												data-bs-toggle="tab"
-												data-bs-target="#login-Employer"
-												type="button"
-											>
-												<i className="fas fa-building" />
-												Placement Officer
-											</button>
-										</li> */}
 									</ul>
 
 									<div className="tab-content" id="myTab2Content">
@@ -162,9 +150,9 @@ function SignInPopup() {
 															className="form-control"
 															required
 															placeholder="Password*"
-															value={password}
+															value={canpassword}
 															onChange={(event) => {
-																setPassword(event.target.value);
+																setCanPassword(event.target.value);
 															}}
 														/>
 													</div>
@@ -243,9 +231,9 @@ function SignInPopup() {
 															className="form-control"
 															required
 															placeholder="Password*"
-															value={password}
+															value={emppassword}
 															onChange={(event) => {
-																setPassword(event.target.value);
+																setEmpPassword(event.target.value);
 															}}
 														/>
 													</div>

@@ -16,6 +16,7 @@ function JobDetail1Page() {
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('candidateToken');
@@ -57,11 +58,15 @@ function JobDetail1Page() {
 
     const handleApplyClick = () => {
         if (!isLoggedIn) {
-            navigate('/login', { state: { returnUrl: `/job-detail/${id}` } });
+            setShowLoginModal(true);
         } else {
             // Handle job application logic here
             alert('Application submitted successfully!');
         }
+    };
+
+    const handleLogin = () => {
+        navigate('/candidate-login');
     };
 
     return (
@@ -228,6 +233,45 @@ function JobDetail1Page() {
 					</div>
 				</div>
 				<ApplyJobPopup />
+				
+				{/* Login Modal */}
+				{showLoginModal && (
+					<div className="modal fade show" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+						<div className="modal-dialog modal-dialog-centered">
+							<div className="modal-content">
+								<div className="modal-header">
+									<h5 className="modal-title">Login Required</h5>
+									<button 
+										type="button" 
+										className="btn-close" 
+										onClick={() => setShowLoginModal(false)}
+									></button>
+								</div>
+								<div className="modal-body text-center p-4">
+									<div className="mb-3">
+										<i className="fa fa-lock" style={{fontSize: '48px', color: '#2a6310'}}></i>
+									</div>
+									<h4 className="mb-3">Please Login for Applying Job</h4>
+									<p className="text-muted mb-4">You need to be logged in as a candidate to apply for jobs.</p>
+									<div className="d-flex gap-2 justify-content-center">
+										<button 
+											className="btn btn-primary px-4"
+											onClick={handleLogin}
+										>
+											Login
+										</button>
+										<button 
+											className="btn btn-secondary px-4"
+											onClick={() => setShowLoginModal(false)}
+										>
+											Cancel
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
 			</>
 		);
 }
